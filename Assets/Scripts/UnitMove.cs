@@ -24,6 +24,7 @@ public class UnitMove : MonoBehaviour
     {
         Initialize();
         Move();
+        CheckTarget();
         //nmAgent.SetDestination(curTarget.transform.position);
     }
 
@@ -62,5 +63,11 @@ public class UnitMove : MonoBehaviour
 
             isInitialize = true;
         }
+    }
+
+    public void CheckTarget()
+    {
+        status = GetComponent<UnitStatus>().status;
+        curTarget = status.curTarget;
     }
 }

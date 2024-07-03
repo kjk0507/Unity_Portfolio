@@ -33,4 +33,9 @@ public class UnitStatus : MonoBehaviour
         this.status.curTarget = curTarget;
         this.status.finalTarget = finalTarget;
     }
+
+    public void ChangeCurTarget(GameObject curTarget)
+    {
+        this.status.curTarget = curTarget;
+    }
 }
