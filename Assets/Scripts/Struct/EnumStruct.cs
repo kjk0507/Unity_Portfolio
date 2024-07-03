@@ -34,7 +34,7 @@ namespace EnumStruct
         Wizard
     }
 
-    public enum Row
+    public enum OutPostRow
     {
         Top,
         Middle,

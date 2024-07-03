@@ -26,7 +26,7 @@ namespace UnitStatusStruct
 
         // 목표 타겟 관련
         public GameObject outPostLocation;
-        public Row curRow;
+        public OutPostRow curRow;
         public GameObject curTarget;
         public GameObject finalTarget;
 

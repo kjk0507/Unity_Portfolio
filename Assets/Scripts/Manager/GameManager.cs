@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +6,8 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager gm_instance;
     public GameObject presentOutpost;
+    public int ruby; // 상점 재화
+    public int gold; // 인게임 생성 재화
 
     void Awake()
     {
@@ -22,6 +24,16 @@ public class GameManager : MonoBehaviour
         //DontDestroyOnLoad(gameObject);
     }
 
+    private void Start()
+    {
+        StartCoroutine(AddGoldRoutine()); // 골드 획득 코루틴
+    }
+
+    private void Update()
+    {
+        
+    }
+
     public GameObject GetPresentOutPost()
     {
         return presentOutpost;
@@ -30,5 +42,27 @@ public class GameManager : MonoBehaviour
     public void SetPresentOutPost(GameObject clickObject)
     {
         presentOutpost = clickObject;
+    }
+
+    public void AddGold()
+    {
+        gold++;
+        //Debug.Log("Gold: " + gold);
+    }
+
+    private IEnumerator AddGoldRoutine()
+    {
+        while (true)
+        {
+            // 1초 대기
+            yield return new WaitForSeconds(1f);
+            // gold 증가
+            AddGold();
+        }
+    }
+
+    public int GetGold()
+    {
+        return gold;
     }
 }

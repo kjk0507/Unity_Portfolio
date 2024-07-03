@@ -13,6 +13,9 @@ public class UIManager : MonoBehaviour
     bool arrowRight = false;
     public float cameraMoveSpeed = 30f;
 
+    // 게임 돈관련
+    public TextMeshProUGUI curGold;
+
     void Start()
     {
 
@@ -22,6 +25,7 @@ public class UIManager : MonoBehaviour
     {
         CheckClickOutpost();
         CheckUiArrow();
+        CheckCurGold();
     }
 
     private void CheckClickOutpost()
@@ -59,7 +63,7 @@ public class UIManager : MonoBehaviour
 
     public void MoveLeft()
     {
-        if(cameraObject.transform.position.x > -70)
+        if(cameraObject.transform.position.x > -80)
         {
             cameraObject.transform.position = cameraObject.transform.position - new Vector3(cameraMoveSpeed * Time.deltaTime, 0, 0);
         }
@@ -67,7 +71,7 @@ public class UIManager : MonoBehaviour
 
     public void MoveRight()
     {
-        if (cameraObject.transform.position.x < 50)
+        if (cameraObject.transform.position.x < 65)
         {
             cameraObject.transform.position = cameraObject.transform.position + new Vector3(cameraMoveSpeed * Time.deltaTime, 0, 0);
         }
@@ -104,5 +108,10 @@ public class UIManager : MonoBehaviour
         {
             MoveRight();
         }
+    }
+
+    public void CheckCurGold()
+    {
+        curGold.text = GameManager.gm_instance.GetGold().ToString();
     }
 }
