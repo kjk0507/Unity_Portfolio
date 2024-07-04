@@ -19,6 +19,7 @@ namespace UnitStatusStruct
         // 공격 관련
         public int finalAtk;
         public int curAtk;
+        public float attackRange;
 
         // 방어 관련
         public int finalDef;
@@ -28,6 +29,7 @@ namespace UnitStatusStruct
         public GameObject outPostLocation;
         public OutPostRow curRow;
         public GameObject curTarget;
+        //public GameObject priorityTarget; // 충돌한 타겟
         public GameObject finalTarget;
 
         public Status()
@@ -44,6 +46,7 @@ namespace UnitStatusStruct
                 this.curAtk = 10;
                 this.curDef = 50;
                 this.curSpeed = 10;
+                this.attackRange = 1f;
             }
             else if(unitType == UnitType.Archer)
             {
@@ -52,6 +55,7 @@ namespace UnitStatusStruct
                 this.curAtk = 20;
                 this.curDef = 20;
                 this.curSpeed = 8;
+                this.attackRange = 2f;
 
             }
             else if(unitType == UnitType.Wizard)
@@ -61,6 +65,7 @@ namespace UnitStatusStruct
                 this.curAtk = 40;
                 this.curDef = 0;
                 this.curSpeed = 5;
+                this.attackRange = 3f;
             }
 
             ChangeStatus(unitType);
@@ -77,6 +82,17 @@ namespace UnitStatusStruct
             this.curAtk = this.finalAtk;
             this.curDef = this.finalDef;
             this.curSpeed = this.finalSpeed;
+        }
+
+        public void Damage(int attackPoint)
+        {
+            int damagePoint = attackPoint - this.finalDef;
+            if (damagePoint < 0)
+            {
+                damagePoint = 0;
+            }
+
+            this.curHp = this.curHp - damagePoint;
         }
     }
 

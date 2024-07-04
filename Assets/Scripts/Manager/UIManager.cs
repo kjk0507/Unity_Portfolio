@@ -44,7 +44,8 @@ public class UIManager : MonoBehaviour
                 Debug.Log("Clicked on: " + hit.collider.name);
                 Debug.Log("Clicked on: " + hit.collider.gameObject.transform.root.gameObject.name);
 
-                clickedObject = hit.collider.gameObject.transform.root.gameObject;
+                //clickedObject = hit.collider.gameObject.transform.root.gameObject;
+                clickedObject = hit.collider.gameObject;
 
                 // 클릭된 오브젝트에서 특정 스크립트를 가져와서 메서드 호출
                 //var clickable = hit.collider.gameObject.GetComponent<IClickable>();
@@ -58,6 +59,10 @@ public class UIManager : MonoBehaviour
             }
 
         }
+
+        // todo 클릭시 오브젝트 테두리 활성화
+        // 유닛 클릭시 공격 범위 표시
+        // 상태창 표시?
 
     }
 

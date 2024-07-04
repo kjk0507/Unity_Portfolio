@@ -21,9 +21,10 @@ namespace EnumStruct
 
     public enum UnitState
     {
-        Standing,
-        Running,
-        Attack,
+        Standing, // 서 있는 중, 생각중
+        Running, // 이동
+        Attack,  // 공격
+        Dying,   // 사망
 
     }
 

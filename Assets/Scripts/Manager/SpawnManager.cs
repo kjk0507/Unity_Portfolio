@@ -16,7 +16,6 @@ public class SpawnManager : MonoBehaviour
     public GameObject outpostBottom;
 
     public GameObject finalTarget;
-
     //public bool spawntest = false;
 
     // 프리팹 위치
