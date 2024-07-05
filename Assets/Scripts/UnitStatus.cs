@@ -3,20 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnitStatusStruct;
 using EnumStruct;
+using UnityEngine.UI;
+
 
 public class UnitStatus : MonoBehaviour
 {
-    public UnitType UnitType;
+    UnitType UnitType;
     public Status status;
-    public UnitState curState = UnitState.Standing;
+    UnitState curState = UnitState.Standing;
     public Animator animator;
+    public Transform firePosition;
+    public GameObject hpBar;
+    Image hpBarImage;
+    Renderer randerer;
 
     bool isAttack = false; // 실제 공격중
 
     void Start()
     {
         animator = GetComponent<Animator>();
+        hpBarImage = hpBar.GetComponent<Image>();
+        randerer = GetComponent<Renderer>();
+
         ActionStanding();
+        InvokeRepeating("hpCurse", 1.0f, 1.0f);
+
+    }
+
+    void hpCurse()
+    {
+        this.status.curHp = this.status.curHp - 10;
     }
 
     void Update()
@@ -25,6 +41,8 @@ public class UnitStatus : MonoBehaviour
         //FindNewEnemy();
         animator.SetInteger("unitState", (int)curState);
         //SelectAction();
+        //this.status.curHp--;
+        CheckCurHp();
     }
 
     private void FixedUpdate()
@@ -34,7 +52,7 @@ public class UnitStatus : MonoBehaviour
 
     public void Initialize(UnitType type, OutPostRow row, GameObject curTarget, GameObject finalTarget)
     {
-        status = new Status(UnitType);
+        status = new Status(type);
 
         UnitType = type;
         this.status.curRow = row;
@@ -50,9 +68,10 @@ public class UnitStatus : MonoBehaviour
     public void SelectAction()
     {
         // todo 대기(0), 이동(1), 공격(2), 사망(3) -> 행동 코드도 따라가야됨 : 애니메이션코드와 상태변경 코드가 같이 실행 될것!
-        if(this.status.curHp < 0)
+        if(this.status.curHp <= 0)
         {
             ChangeCurState(UnitState.Dying);
+            return;
         }
 
         switch (curState)
@@ -98,13 +117,19 @@ public class UnitStatus : MonoBehaviour
         {
             float distance = Vector2.Distance(curTarget.transform.position, transform.position);
 
+            if(curTarget.tag == "Outpost")
+            {
+                // 초기 전초기지에 안들어가는 현상 수정
+                distance = 100f;
+            }
+
             // 테스트
             //RaycastHit hit;
             //Physics.Raycast(gameObject.transform.position, gameObject.transform.forward, out hit, 1f);
-            //Debug.DrawRay(gameObject.transform.position, gameObject.transform.forward * 15f, Color.red);
+            //Debug.DrawRay(gameObject.transform.position, gameObject.transform.forward * this.status.attackRange, Color.red);
 
             // 거리가 사거리보다 작다면 공격으로 전환
-            if (distance < status.attackRange)
+            if (distance < this.status.attackRange)
             {
                 ChangeCurState(UnitState.Attack);
                 return;
@@ -178,6 +203,18 @@ public class UnitStatus : MonoBehaviour
             case "Archer":
                 // 화살 소환
                 // 데미지는 다른 스크립트
+                Debug.Log("Archer_Attack");
+                string prefabPath = "Prefabs/Weapon/Arrow/Arrow";
+                GameObject prefab = Resources.Load<GameObject>(prefabPath);
+
+                // 대상과 방향 측정
+                Vector3 direction = (this.status.curTarget.transform.position - firePosition.transform.position).normalized;
+                Quaternion quaternion = Quaternion.identity;
+                quaternion.eulerAngles = direction;
+
+                GameObject arrow = Instantiate(prefab, firePosition.position, quaternion);
+                arrow.GetComponent<ProjectileControl>().Initialize(this.status.curTarget, this.status.finalAtk);
+                arrow.GetComponent<Rigidbody>().velocity = new Vector3(this.status.attackSpeed, 0, 0);
                 break;
             case "Wizard":
                 // 불덩이 소환
@@ -198,7 +235,7 @@ public class UnitStatus : MonoBehaviour
     {
         // 죽는 애니메이션 끝에 호출
         // 오브젝트 삭제
-
+        Destroy(gameObject);
     }
 
     public void FindNewEnemy()
@@ -208,6 +245,11 @@ public class UnitStatus : MonoBehaviour
             // 해당열 적을 우선 타겟
             // 없다면 가장 가까운 적 타겟
         }
+    }
+
+    public void CheckCurHp()
+    {
+        hpBarImage.fillAmount = (float)this.status.curHp / this.status.finalHp;
     }
 
     private void OnTriggerEnter(Collider unit)

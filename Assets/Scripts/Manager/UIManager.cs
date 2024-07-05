@@ -41,8 +41,8 @@ public class UIManager : MonoBehaviour
             if (Physics.Raycast(ray, out hit))
             {
                 // 레이캐스트가 충돌한 오브젝트 출력
-                Debug.Log("Clicked on: " + hit.collider.name);
-                Debug.Log("Clicked on: " + hit.collider.gameObject.transform.root.gameObject.name);
+                //Debug.Log("Clicked on: " + hit.collider.name);
+                //Debug.Log("Clicked on: " + hit.collider.gameObject.transform.root.gameObject.name);
 
                 //clickedObject = hit.collider.gameObject.transform.root.gameObject;
                 clickedObject = hit.collider.gameObject;
@@ -54,10 +54,12 @@ public class UIManager : MonoBehaviour
                 //    clickable.OnClick();
                 //}
 
-                GameManager.gm_instance.SetPresentOutPost(clickedObject);
-                clickedOutpost.text = clickedObject.name.ToString();
+                if(clickedObject.tag == "Outpost")
+                {
+                    GameManager.gm_instance.SetPresentOutPost(clickedObject);
+                    clickedOutpost.text = clickedObject.name.ToString();
+                }
             }
-
         }
 
         // todo 클릭시 오브젝트 테두리 활성화

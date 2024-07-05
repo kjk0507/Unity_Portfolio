@@ -12,7 +12,7 @@ namespace UnitStatusStruct
 
         // 스테이터스
         public int finalHp;
-        public int curHp;
+        public int curHp = 1;
         public float finalSpeed;
         public float curSpeed;
 
@@ -20,6 +20,7 @@ namespace UnitStatusStruct
         public int finalAtk;
         public int curAtk;
         public float attackRange;
+        public float attackSpeed; // 투사체의 경우
 
         // 방어 관련
         public int finalDef;
@@ -47,6 +48,7 @@ namespace UnitStatusStruct
                 this.curDef = 50;
                 this.curSpeed = 10;
                 this.attackRange = 1f;
+                this.attackSpeed = 1f;
             }
             else if(unitType == UnitType.Archer)
             {
@@ -54,8 +56,9 @@ namespace UnitStatusStruct
                 this.curHp = 70;
                 this.curAtk = 20;
                 this.curDef = 20;
-                this.curSpeed = 8;
-                this.attackRange = 2f;
+                this.curSpeed = 6;
+                this.attackRange = 10f;
+                this.attackSpeed = 50f;
 
             }
             else if(unitType == UnitType.Wizard)
@@ -64,8 +67,9 @@ namespace UnitStatusStruct
                 this.curHp = 100;
                 this.curAtk = 40;
                 this.curDef = 0;
-                this.curSpeed = 5;
-                this.attackRange = 3f;
+                this.curSpeed = 3;
+                this.attackRange = 20f;
+                this.attackSpeed= 35f;
             }
 
             ChangeStatus(unitType);

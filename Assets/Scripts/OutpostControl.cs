@@ -25,7 +25,7 @@ public class OutpostControl : MonoBehaviour
     int archerNum = 0;
     int wizardNum = 0;
 
-    public GameObject witingImage;
+    public GameObject waitingImage;
     public GameObject goImage;
 
     public GameObject spawnLocation;
@@ -38,7 +38,7 @@ public class OutpostControl : MonoBehaviour
 
     void Start()
     {
-        
+
     }
 
     void Update()
@@ -61,6 +61,16 @@ public class OutpostControl : MonoBehaviour
     {
         List<Transform> units = new List<Transform>();
         foreach (Transform unit in warriorList.transform)
+        {
+            units.Add(unit);
+        }
+
+        foreach (Transform unit in archerList.transform)
+        {
+            units.Add(unit);
+        }
+
+        foreach (Transform unit in wizardList.transform)
         {
             units.Add(unit);
         }
@@ -96,14 +106,8 @@ public class OutpostControl : MonoBehaviour
                     break;
             }
 
-            //unit.transform.rotation = Quaternion.Euler(0, 90, 0);
             unit.gameObject.SetActive(true);
         }
-
-        //if(warriorNum != 0 || archerNum !=0 || wizardNum != 0)
-        //{
-        //    ChangeUnitTarget();
-        //}
     }
 
     public void CheckOutpostState()
@@ -112,14 +116,14 @@ public class OutpostControl : MonoBehaviour
 
         if(!isWaiting) // 전진 상태 -> 대기 상태
         {
-            witingImage.SetActive(true);
+            waitingImage.SetActive(true);
             goImage.SetActive(false);
             
             isWaiting = true;  // 부딪힘과 동시에 다시 변경되면 어짜피 안됨
         }
         else if(isWaiting) // 대기 상태 -> 전진 상태
         {
-            witingImage.SetActive(false);
+            waitingImage.SetActive(false);
             goImage.SetActive(true);
 
             ChangeUnitTarget();
@@ -130,11 +134,6 @@ public class OutpostControl : MonoBehaviour
 
     private void OnTriggerEnter(Collider unit)
     {
-        //if(!isWaiting) // 전진 상태에선 무시
-        //{
-        //    return;
-        //}
-
         GameObject checkObject = unit.gameObject;
         string tag = unit.tag;
 
