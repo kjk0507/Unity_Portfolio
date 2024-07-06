@@ -45,7 +45,7 @@ namespace UnitStatusStruct
                 this.name = "Warrior";
                 this.curHp = 100;
                 this.curAtk = 10;
-                this.curDef = 50;
+                this.curDef = 0;
                 this.curSpeed = 10;
                 this.attackRange = 8f;
                 this.attackSpeed = 1f;
@@ -55,7 +55,7 @@ namespace UnitStatusStruct
                 this.name = "Archer";
                 this.curHp = 70;
                 this.curAtk = 20;
-                this.curDef = 20;
+                this.curDef = 0;
                 this.curSpeed = 6;
                 this.attackRange = 20f;
                 this.attackSpeed = 50f;
@@ -73,6 +73,63 @@ namespace UnitStatusStruct
             }
 
             ChangeStatus(unitType);
+        }
+
+        public Status(EnemyUnitType type)
+        {
+            if (type == EnemyUnitType.Orc)
+            {
+                this.name = "Orc";
+                this.curHp = 100;
+                this.curAtk = 20;
+                this.curDef = 0;
+                this.curSpeed = 10;
+                this.attackRange = 8f;
+                this.attackSpeed = 1f;
+            }
+            else if (type == EnemyUnitType.BoneSoldier)
+            {
+                this.name = "BoneSoldier";
+                this.curHp = 70;
+                this.curAtk = 30;
+                this.curDef = 0;
+                this.curSpeed = 6;
+                this.attackRange = 20f;
+                this.attackSpeed = 50f;
+
+            }
+            else if (type == EnemyUnitType.Destroyer)
+            {
+                this.name = "Destroyer";
+                this.curHp = 200;
+                this.curAtk = 50;
+                this.curDef = 0;
+                this.curSpeed = 6;
+                this.attackRange = 8f;
+                this.attackSpeed = 35f;
+            }
+            else if (type == EnemyUnitType.Door)
+            {
+                this.name = "Door";
+                this.curHp = 1000;
+                this.curAtk = 0;
+                this.curDef = 0;
+                this.curSpeed = 3;
+                this.attackRange = 0f;
+                this.attackSpeed = 0f;
+            }
+            else if (type == EnemyUnitType.Tower)
+            {
+                this.name = "Tower";
+                this.curHp = 500;
+                this.curAtk = 30;
+                this.curDef = 0;
+                this.curSpeed = 3;
+                this.attackRange = 50f;
+                this.attackSpeed = 0f;
+            }
+
+            //ChangeStatus(type);
         }
 
         private void ChangeStatus(UnitType unitType)

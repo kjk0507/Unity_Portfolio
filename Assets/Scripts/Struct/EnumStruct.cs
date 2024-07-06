@@ -21,11 +21,10 @@ namespace EnumStruct
 
     public enum UnitState
     {
-        Standing, // 서 있는 중, 생각중
-        Running, // 이동
+        Idle, // 서 있는 중, 생각중
+        Move, // 이동
         Attack,  // 공격
-        Dying,   // 사망
-
+        Death,   // 사망
     }
 
     public enum UnitType
@@ -42,4 +41,18 @@ namespace EnumStruct
         Bottom,
     }
 
+    public enum EnemyUnitType
+    {        
+        Orc,
+        BoneSoldier,
+        Destroyer,
+        Tower,
+        Door,
+    }
+
+    public enum DamageType
+    {
+        Target,
+        AOE,
+    }
 }
