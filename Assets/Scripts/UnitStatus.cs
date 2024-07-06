@@ -26,7 +26,7 @@ public class UnitStatus : MonoBehaviour
         randerer = GetComponent<Renderer>();
 
         ActionStanding();
-        InvokeRepeating("hpCurse", 1.0f, 1.0f);
+        //InvokeRepeating("hpCurse", 1.0f, 1.0f);
 
     }
 
@@ -235,16 +235,72 @@ public class UnitStatus : MonoBehaviour
     {
         // 죽는 애니메이션 끝에 호출
         // 오브젝트 삭제
+        string tag = this.gameObject.tag;
+        switch (tag)
+        {
+            case "Warrior":
+                UnitManager.um_instance.warriorList.Remove(gameObject);
+                break;
+            case "Archer":
+                UnitManager.um_instance.archerList.Remove(gameObject);
+                break;
+            case "Wizard":
+                UnitManager.um_instance.wizardList.Remove(gameObject);
+                break;
+        }
+        
         Destroy(gameObject);
     }
 
     public void FindNewEnemy()
     {
-        if(status.curTarget == null)
+        if(this.status.curTarget == null)
         {
             // 해당열 적을 우선 타겟
-            // 없다면 가장 가까운 적 타겟
+            // 없다면 가장 가까운 적 타겟            
+            OutPostRow row = this.status.curRow;
+            Transform line = null;
+            line = UnitManager.um_instance.FindLine(row);
+            this.status.curTarget = CheckLineEnemy(line);
         }
+    }
+
+    public GameObject CheckLineEnemy(Transform line)
+    {
+        GameObject newTarget = null;
+        float closestDistance = Mathf.Infinity;
+        int checkUnitCount = 0;
+
+        foreach (Transform unit in line)
+        {
+            float distance = Vector3.Distance(transform.position, unit.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                newTarget = unit.gameObject;
+            }
+
+            checkUnitCount++;
+        }
+
+        if(checkUnitCount == 0)
+        {
+            List<GameObject> FoundObjects;
+            FoundObjects = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
+
+
+            foreach (GameObject obj in FoundObjects)
+            {
+                float distance = Vector3.Distance(transform.position, obj.transform.position);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    newTarget = obj.transform.gameObject;
+                }
+            }
+        }
+
+        return newTarget;
     }
 
     public void CheckCurHp()
@@ -260,9 +316,14 @@ public class UnitStatus : MonoBehaviour
         GameObject checkObject = unit.gameObject;
         string tag = unit.tag;
 
-        if(checkObject.layer.Equals("Enemy") && isAttack)
+        //if(checkObject.layer.Equals("Enemy") && isAttack)
+        //{
+        //    status.curTarget = checkObject;
+        //}
+
+        if (checkObject.CompareTag("Enemy") && isAttack)
         {
-            status.curTarget = checkObject;
+            this.status.curTarget = checkObject;
         }
     }
 }

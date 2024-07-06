@@ -111,5 +111,8 @@ public class SpawnManager : MonoBehaviour
         GameObject instance = Instantiate(prefab, spawnLocation.transform);
         //instance.GetComponent<UnitStatus>().SetUnitType(UnitType.Warrior);
         instance.GetComponent<UnitStatus>().Initialize(type, row, outpostTarget, finalTarget);
+
+        UnitManager.um_instance.RegistUnit(instance, type);
+
     }
 }

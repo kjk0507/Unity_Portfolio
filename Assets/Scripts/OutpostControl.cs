@@ -34,7 +34,7 @@ public class OutpostControl : MonoBehaviour
     public GameObject middleLine;
     public GameObject bottomLine;
 
-    public GameObject testtarget;
+    //public GameObject testtarget;
 
     void Start()
     {
@@ -88,8 +88,10 @@ public class OutpostControl : MonoBehaviour
             Vector3 finalPosition = spawnLocation.transform.position + randomOffset;
 
             unit.gameObject.transform.position = finalPosition;
+            // 원래는 타겟을 강제로 바꾸는 코드였으나 unitstatus에서 실행
+            unit.gameObject.GetComponent<UnitStatus>().ChangeCurTarget(null);
             //unit.gameObject.transform.position = spawnLocation.transform.position;
-            unit.gameObject.GetComponent<UnitStatus>().ChangeCurTarget(testtarget);
+            //unit.gameObject.GetComponent<UnitStatus>().ChangeCurTarget(testtarget);
 
             OutPostRow row = unit.gameObject.GetComponent<UnitStatus>().status.curRow;
 

@@ -11,6 +11,10 @@ public class UnitManager : MonoBehaviour
     public List<GameObject> archerList;
     public List<GameObject> wizardList;
 
+    public Transform topLine;
+    public Transform middleLine;
+    public Transform bottomLine;
+
     public int warrior_equip_hp;
     public int warrior_equip_atk;
     public int warrior_equip_def;
@@ -132,5 +136,41 @@ public class UnitManager : MonoBehaviour
         }
 
         return extraSpeed;
+    }
+
+    public void RegistUnit(GameObject obj, UnitType type)
+    {
+        if (type == UnitType.Warrior)
+        {
+            warriorList.Add(obj);
+        }
+        else if (type == UnitType.Archer)
+        {
+            archerList.Add(obj);
+        }
+        else if (type == UnitType.Wizard)
+        {
+            wizardList.Add(obj);
+        }
+    }
+
+    public Transform FindLine(OutPostRow row)
+    {
+        Transform line = null;
+
+        switch (row)
+        {
+            case OutPostRow.Top:
+                line = topLine;
+                break;
+            case OutPostRow.Middle:
+                line = middleLine;
+                break;
+            case OutPostRow.Bottom:
+                line = bottomLine;
+                break;
+        }
+
+        return line;
     }
 }

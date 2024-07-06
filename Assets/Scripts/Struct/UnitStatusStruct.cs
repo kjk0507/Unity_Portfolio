@@ -47,7 +47,7 @@ namespace UnitStatusStruct
                 this.curAtk = 10;
                 this.curDef = 50;
                 this.curSpeed = 10;
-                this.attackRange = 1f;
+                this.attackRange = 8f;
                 this.attackSpeed = 1f;
             }
             else if(unitType == UnitType.Archer)
@@ -57,7 +57,7 @@ namespace UnitStatusStruct
                 this.curAtk = 20;
                 this.curDef = 20;
                 this.curSpeed = 6;
-                this.attackRange = 10f;
+                this.attackRange = 20f;
                 this.attackSpeed = 50f;
 
             }
@@ -68,7 +68,7 @@ namespace UnitStatusStruct
                 this.curAtk = 40;
                 this.curDef = 0;
                 this.curSpeed = 3;
-                this.attackRange = 20f;
+                this.attackRange = 35f;
                 this.attackSpeed= 35f;
             }
 

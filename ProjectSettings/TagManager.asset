@@ -8,6 +8,7 @@ TagManager:
   - Warrior
   - Archer
   - Wizard
+  - Enemy
   layers:
   - Default
   - TransparentFX
