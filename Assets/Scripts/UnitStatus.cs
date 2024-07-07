@@ -195,6 +195,12 @@ public class UnitStatus : MonoBehaviour
         // isAttack 이 참인 경우 실행가능
         // 해당 타겟이 사망하는 경우, 유닛이 사망하는 경우에만 공격이 중지
         string tag = this.gameObject.tag;
+        string prefabPath;
+        GameObject prefab;
+        Quaternion quaternion = Quaternion.identity;
+        Vector3 direction;
+        Quaternion rotation;
+
 
         switch (tag)
         {
@@ -208,14 +214,12 @@ public class UnitStatus : MonoBehaviour
                 // 몹 이동시 방향 이동
                 transform.LookAt(this.status.curTarget.transform);
 
-                string prefabPath = "Prefabs/Weapon/Arrow/Arrow";
-                GameObject prefab = Resources.Load<GameObject>(prefabPath);
+                prefabPath = "Prefabs/Skill/Arrow";
+                prefab = Resources.Load<GameObject>(prefabPath);
 
-                Quaternion quaternion = Quaternion.identity;
-
-                //Vector3 direction = (this.status.curTarget.transform.position - firePosition.position).normalized;
-                Vector3 direction = firePosition.forward;
-                Quaternion rotation = Quaternion.LookRotation(direction);
+                quaternion = Quaternion.identity;
+                direction = firePosition.forward;
+                rotation = Quaternion.LookRotation(direction);
 
                 GameObject arrow = Instantiate(prefab, firePosition.position, quaternion);
                 arrow.transform.rotation = rotation;
@@ -224,6 +228,20 @@ public class UnitStatus : MonoBehaviour
             case "Wizard":
                 // 불덩이 소환
                 // 데미지는 다른 스크립트, 불덩이는 파티클 만들어보기
+                transform.LookAt(this.status.curTarget.transform);
+
+                prefabPath = "Prefabs/Skill/Fireball";
+                prefab = Resources.Load<GameObject>(prefabPath);
+
+                quaternion = Quaternion.identity;
+
+                //Vector3 direction = (this.status.curTarget.transform.position - firePosition.position).normalized;
+                direction = firePosition.forward;
+                rotation = Quaternion.LookRotation(direction);
+
+                GameObject fireball = Instantiate(prefab, firePosition.position, quaternion);
+                fireball.transform.rotation = rotation;
+                fireball.GetComponent<ProjectileControl>().Initialize(this.status.curTarget, DamageType.AOE, PlayerDefine.Player, this.status.attackSpeed, this.status.finalAtk);
                 break;
             default:
                 return;
@@ -299,11 +317,30 @@ public class UnitStatus : MonoBehaviour
 
         if(checkUnitCount == 0)
         {
-            List<GameObject> FoundObjects;
-            FoundObjects = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
+            // 태그를 통한 적 탐지 방법
+            //List<GameObject> FoundObjects;
+            //FoundObjects = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
 
 
-            foreach (GameObject obj in FoundObjects)
+            //foreach (GameObject obj in FoundObjects)
+            //{
+            //    float distance = Vector3.Distance(transform.position, obj.transform.position);
+            //    if (distance < closestDistance)
+            //    {
+            //        closestDistance = distance;
+            //        newTarget = obj.transform.gameObject;
+            //    }
+            //}
+
+            // 레이어를 통한 적 탐지 방법
+            float searchRadius = 50f;
+            int enemyLayerMask = LayerMask.GetMask("Enemy");
+            Vector3 currentPosition = transform.position;
+            Collider[] colliders = Physics.OverlapSphere(currentPosition, searchRadius, enemyLayerMask);
+            //Collider closestEnemy = null;
+            //float closestDistanceSqr = Mathf.Infinity;
+
+            foreach (Collider obj in colliders)
             {
                 float distance = Vector3.Distance(transform.position, obj.transform.position);
                 if (distance < closestDistance)

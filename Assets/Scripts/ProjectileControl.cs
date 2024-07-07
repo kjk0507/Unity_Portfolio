@@ -104,19 +104,19 @@ public class ProjectileControl : MonoBehaviour
         {
             if (curDefine == PlayerDefine.Player)
             {
-                if (curTarget.CompareTag("Enemy"))
+                if (checkObject.layer.Equals("Enemy"))
                 {
                     targetList.Add(checkObject);
                 }
             }
             else
             {
-                if (!curTarget.CompareTag("Enemy"))
+                if (curTarget.CompareTag("FriendlyUnit"))
                 {
                     targetList.Add(checkObject);
                 }
             }
-            
+
         }
 
         //if (!checkObject.layer.Equals("FriendlyUnit"))
