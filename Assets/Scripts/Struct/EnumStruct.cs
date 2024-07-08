@@ -34,7 +34,7 @@ namespace EnumStruct
         Wizard
     }
 
-    public enum OutPostRow
+    public enum LineType
     {
         Top,
         Middle,
@@ -44,7 +44,7 @@ namespace EnumStruct
     public enum EnemyUnitType
     {        
         Orc,
-        BoneSoldier,
+        BoneArcher,
         Destroyer,
         Tower,
         Door,

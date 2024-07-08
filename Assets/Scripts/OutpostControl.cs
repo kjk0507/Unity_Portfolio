@@ -90,20 +90,18 @@ public class OutpostControl : MonoBehaviour
             unit.gameObject.transform.position = finalPosition;
             // 원래는 타겟을 강제로 바꾸는 코드였으나 unitstatus에서 실행
             unit.gameObject.GetComponent<UnitStatus>().ChangeCurTarget(null);
-            //unit.gameObject.transform.position = spawnLocation.transform.position;
-            //unit.gameObject.GetComponent<UnitStatus>().ChangeCurTarget(testtarget);
 
-            OutPostRow row = unit.gameObject.GetComponent<UnitStatus>().status.curRow;
+            LineType row = unit.gameObject.GetComponent<UnitStatus>().status.curRow;
 
             switch (row)
             {
-                case OutPostRow.Top:
+                case LineType.Top:
                     unit.transform.SetParent(topLine.transform);
                     break;
-                case OutPostRow.Middle:
+                case LineType.Middle:
                     unit.transform.SetParent(middleLine.transform);
                     break;
-                case OutPostRow.Bottom:
+                case LineType.Bottom:
                     unit.transform.SetParent(bottomLine.transform);
                     break;
             }
@@ -114,8 +112,6 @@ public class OutpostControl : MonoBehaviour
 
     public void CheckOutpostState()
     {
-        Debug.Log("check");
-
         if(!isWaiting) // 전진 상태 -> 대기 상태
         {
             waitingImage.SetActive(true);

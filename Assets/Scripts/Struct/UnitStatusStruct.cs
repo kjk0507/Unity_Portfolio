@@ -28,7 +28,7 @@ namespace UnitStatusStruct
 
         // 목표 타겟 관련
         public GameObject outPostLocation;
-        public OutPostRow curRow;
+        public LineType curRow; // 해당 라인
         public GameObject curTarget;
         //public GameObject priorityTarget; // 충돌한 타겟
         public GameObject finalTarget;
@@ -87,9 +87,9 @@ namespace UnitStatusStruct
                 this.attackRange = 8f;
                 this.attackSpeed = 1f;
             }
-            else if (type == EnemyUnitType.BoneSoldier)
+            else if (type == EnemyUnitType.BoneArcher)
             {
-                this.name = "BoneSoldier";
+                this.name = "BoneArcher";
                 this.curHp = 70;
                 this.curAtk = 30;
                 this.curDef = 0;
@@ -129,7 +129,7 @@ namespace UnitStatusStruct
                 this.attackSpeed = 0f;
             }
 
-            //ChangeStatus(type);
+            ChangeStatus(type);
         }
 
         private void ChangeStatus(UnitType unitType)
@@ -143,6 +143,14 @@ namespace UnitStatusStruct
             this.curAtk = this.finalAtk;
             this.curDef = this.finalDef;
             this.curSpeed = this.finalSpeed;
+        }
+
+        private void ChangeStatus(EnemyUnitType unitType)
+        {
+            this.finalHp = curHp;
+            this.finalAtk = curAtk;
+            this.finalDef = curDef;
+            this.finalSpeed = curSpeed;
         }
 
         public void Damage(int attackPoint)

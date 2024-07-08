@@ -1,40 +1,30 @@
 using EnumStruct;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnitStatusStruct;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
-public class EnemyStatus : MonoBehaviour
+public class InheriteStatus : MonoBehaviour
 {
-    EnemyUnitType enemyUnitType;
+    public UnitType unitType;
     public Status status;
     public UnitState curState;
-    public Animator animator;
+    protected Animator animator;
+    //public GameObject hpBar;
+    public GameObject Target;
     public Transform firePosition;
-    public GameObject hpBar;
-    Image hpBarImage;
-    //public GameObject Target;
+    public Image hpBarImage;
 
     bool isAttack = false; // 실제 공격중
     bool isTargetDeath = false; // 타겟의 생존 여부 false : 생존
+    public bool isAttackMotion = false; // true : 모션 실행중 / false : 모션 실행 안하는중
 
-    private void Start()
-    {
-        //status = new Status(EnemyUnitType.Orc);
-        animator = GetComponent<Animator>();
-        hpBarImage = hpBar.GetComponent<Image>();
-        //InvokeRepeating("hpCurse", 1.0f, 1.0f);
-    }
+    public int enemyLayerMask;
 
-    private void Update()
+    void Start()
     {
-        CheckCurHp();
-        CheckTargetDeath();
-        //Target = this.status.curTarget;        
-    }
-
-    private void FixedUpdate()
-    {
-        SelectAction();
     }
 
     void hpCurse()
@@ -42,11 +32,21 @@ public class EnemyStatus : MonoBehaviour
         this.status.curHp = this.status.curHp - 10;
     }
 
-    public void Initialize(EnemyUnitType type, LineType row, GameObject curTarget, GameObject finalTarget)
+    void Update()
+    {
+
+    }
+
+    private void FixedUpdate()
+    {
+
+    }
+
+    public void Initialize(UnitType type, LineType row, GameObject curTarget, GameObject finalTarget)
     {
         status = new Status(type);
 
-        enemyUnitType = type;
+        unitType = type;
         this.status.curRow = row;
         this.status.curTarget = curTarget;
         this.status.finalTarget = finalTarget;
@@ -54,12 +54,14 @@ public class EnemyStatus : MonoBehaviour
 
     public void SelectAction()
     {
+        // todo 대기(0), 이동(1), 공격(2), 사망(3) -> 행동 코드도 따라가야됨 : 애니메이션코드와 상태변경 코드가 같이 실행 될것!
         if (this.status.curHp <= 0)
         {
             ChangeCurState(UnitState.Death);
         }
 
-        animator.SetInteger("unitState", (int)curState);
+        //animator.SetInteger("unitState", (int)curState);
+        //animator.SetBool("isAttackMotion", isAttackMotion);
 
         switch (curState)
         {
@@ -76,14 +78,14 @@ public class EnemyStatus : MonoBehaviour
                 ActionDeath();
                 break;
         }
-
     }
 
     public void ChangeCurState(UnitState state)
     {
         curState = state;
+        animator.SetInteger("unitState", (int)curState);
+        animator.SetBool("isAttackMotion", isAttackMotion);
     }
-
     public void ChangeCurTarget(GameObject curTarget)
     {
         this.status.curTarget = curTarget;
@@ -91,6 +93,7 @@ public class EnemyStatus : MonoBehaviour
 
     public void ActionIdle()
     {
+        // 목표가 있다면 이동 -> 이동에서 공격
         if (this.status.curTarget != null)
         {
             ChangeCurState(UnitState.Move);
@@ -100,11 +103,19 @@ public class EnemyStatus : MonoBehaviour
 
     public void ActionMove()
     {
+        // 타겟과 거리 측정 후 사정거리 안에 들어오는 경우에 공격으로 전환
+        // 아니라면 이동 실행
         GameObject curTarget = this.status.curTarget;
 
         if (this.status.curTarget != null)
         {
             float distance = Vector3.Distance(curTarget.transform.position, transform.position);
+
+            if (curTarget.tag == "Outpost")
+            {
+                // 초기 전초기지에 안들어가는 현상 수정
+                distance = 100f;
+            }
 
             Vector3 direction = (curTarget.transform.position - transform.position).normalized;
             Vector3 newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;
@@ -116,6 +127,16 @@ public class EnemyStatus : MonoBehaviour
                 ChangeCurState(UnitState.Attack);
                 return;
             }
+
+            // isAttackMotion이 false여야 이동;
+            if(isAttackMotion)
+            {
+                isAttackMotion = false;
+                animator.SetBool("isAttackMotion", false);
+                ChangeCurState(UnitState.Idle);
+                return;
+            }
+
             // 거리가 사거리보다 크다면 이동
             transform.position = newPosition;
             return;
@@ -124,16 +145,17 @@ public class EnemyStatus : MonoBehaviour
 
     public void ActionAttack()
     {
+        // 타겟이 사망하거나 자신이 죽은 경우 바뀌어야함
         isAttack = true;
+        isAttackMotion = true;
 
         // 타겟이 이동했는데 거리가 멀어졌을시
-        if (this.status.curTarget != null)
+        if (this.status.curTarget != null || this.status.curTarget.GetComponent<Collider>() == null)
         {
             float distance = Vector3.Distance(this.status.curTarget.transform.position, transform.position);
 
             if (distance > this.status.attackRange)
             {
-                isAttack = false;
                 ChangeCurState(UnitState.Idle);
                 return;
             }
@@ -142,108 +164,40 @@ public class EnemyStatus : MonoBehaviour
 
     public void ActionDeath()
     {
-        //Destroy(gameObject);
         Collider collider = GetComponent<Collider>();
-        //collider.enabled = false;
         Destroy(collider);
 
         Rigidbody rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.constraints = RigidbodyConstraints.FreezePosition;
     }
+    
+    //public void TestDebugRay()
+    //{
+    //    Vector3 direction = (this.status.curTarget.transform.position - firePosition.position);
+    //    Quaternion quaternion = Quaternion.LookRotation(direction);
 
-    public void Attacking()
+    //    RaycastHit hit;
+    //    Physics.Raycast(gameObject.transform.position, gameObject.transform.forward, out hit, 1f);
+    //    Debug.DrawRay(firePosition.position, firePosition.right * this.status.attackRange, Color.red);
+    //}
+
+    public void EndAttackMotion()
     {
-        //string tag = this.gameObject.tag;
-        EnemyUnitType unitType = this.enemyUnitType;
-        string prefabPath;
-        GameObject prefab;
-        Quaternion quaternion = Quaternion.identity;
-        Vector3 direction;
-        Quaternion rotation;
-
-        switch (unitType)
-        {
-            case EnemyUnitType.Orc:
-                // 몬스터의 체력을 깍는 함수 실행
-                DamageToEnemy();
-                break;
-            case EnemyUnitType.BoneArcher:
-                // 화살 소환
-                // 발사 및 데미지는 다른 스크립트
-                // 몹 이동시 방향 이동
-                transform.LookAt(this.status.curTarget.transform);
-
-                prefabPath = "Prefabs/Skill/Arrow";
-                prefab = Resources.Load<GameObject>(prefabPath);
-
-                quaternion = Quaternion.identity;
-                direction = firePosition.forward;
-                rotation = Quaternion.LookRotation(direction);
-
-                GameObject arrow = Instantiate(prefab, firePosition.position, quaternion);
-                arrow.transform.rotation = rotation;
-                arrow.GetComponent<ProjectileControl>().Initialize(this.status.curTarget, DamageType.Target, PlayerDefine.Player, this.status.attackSpeed, this.status.finalAtk);
-                break;
-            case EnemyUnitType.Destroyer:
-                // 불덩이 소환
-                // 데미지는 다른 스크립트, 불덩이는 파티클 만들어보기
-                transform.LookAt(this.status.curTarget.transform);
-
-                prefabPath = "Prefabs/Skill/Fireball";
-                prefab = Resources.Load<GameObject>(prefabPath);
-
-                quaternion = Quaternion.identity;
-
-                //Vector3 direction = (this.status.curTarget.transform.position - firePosition.position).normalized;
-                direction = firePosition.forward;
-                rotation = Quaternion.LookRotation(direction);
-
-                GameObject fireball = Instantiate(prefab, firePosition.position, quaternion);
-                fireball.transform.rotation = rotation;
-                fireball.GetComponent<ProjectileControl>().Initialize(this.status.curTarget, DamageType.AOE, PlayerDefine.Player, this.status.attackSpeed, this.status.finalAtk);
-                break;
-            default:
-                return;
-        }
-    }
-
-    public void DamageToEnemy()
-    {
-        status.curTarget.GetComponent<UnitStatus>().status.Damage(this.status.finalAtk);
-    }
-
-    public void Dying()
-    {
-        EnemyUnitType unitType = this.enemyUnitType;
-
-        switch (unitType)
-        {
-            case EnemyUnitType.Orc:
-                UnitManager.um_instance.orcList.Remove(gameObject);
-                break;
-            case EnemyUnitType.BoneArcher:
-                UnitManager.um_instance.archerList.Remove(gameObject);
-                break;
-            case EnemyUnitType.Destroyer:
-                UnitManager.um_instance.destroyerList.Remove(gameObject);
-                break;
-        }
-
-        Destroy(gameObject);
+        isAttackMotion = false;
     }
 
     public void FindNewEnemy()
     {
-        if (this.status.curTarget == null || this.status.curTarget.GetComponent<Collider>() == null)
-        {
-            // 해당열 적을 우선 타겟
-            // 없다면 가장 가까운 적 타겟            
-            LineType row = this.status.curRow;
-            Transform line = null;
-            line = UnitManager.um_instance.FindLine(row);
-            this.status.curTarget = CheckLineEnemy(line);
-        }
+        // 해당열 적을 우선 타겟
+        // 없다면 가장 가까운 적 타겟
+
+        LineType row = this.status.curRow;
+        Transform line = null;
+        line = UnitManager.um_instance.FindLine(row);
+        this.status.curTarget = CheckLineEnemy(line);
+
+        ChangeCurState(UnitState.Idle);
     }
 
     public GameObject CheckLineEnemy(Transform line)
@@ -254,7 +208,12 @@ public class EnemyStatus : MonoBehaviour
 
         foreach (Transform unit in line)
         {
-            int enemyLayerMask = LayerMask.NameToLayer("Enemy");
+            if (unit.GetComponent<Collider>() == null)
+            {
+                continue;
+            }
+
+            int enemyLayerMask = LayerMask.NameToLayer("Player");
             if (unit.gameObject.layer == enemyLayerMask)
             {
                 continue;
@@ -272,9 +231,23 @@ public class EnemyStatus : MonoBehaviour
 
         if (checkUnitCount == 0)
         {
+            // 태그를 통한 적 탐지 방법
+            //List<GameObject> FoundObjects;
+            //FoundObjects = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
+
+
+            //foreach (GameObject obj in FoundObjects)
+            //{
+            //    float distance = Vector3.Distance(transform.position, obj.transform.position);
+            //    if (distance < closestDistance)
+            //    {
+            //        closestDistance = distance;
+            //        newTarget = obj.transform.gameObject;
+            //    }
+            //}
+
             // 레이어를 통한 적 탐지 방법
             float searchRadius = 50f;
-            int enemyLayerMask = LayerMask.GetMask("Player");
             Vector3 currentPosition = transform.position;
             Collider[] colliders = Physics.OverlapSphere(currentPosition, searchRadius, enemyLayerMask);
             //Collider closestEnemy = null;
@@ -292,12 +265,7 @@ public class EnemyStatus : MonoBehaviour
         }
 
         return newTarget;
-    }
-
-    public void CheckCurHp()
-    {
-        hpBarImage.fillAmount = (float)this.status.curHp / this.status.finalHp;
-    }
+    }    
 
     public void CheckTargetDeath()
     {
@@ -311,17 +279,19 @@ public class EnemyStatus : MonoBehaviour
         {
             isTargetDeath = false;
             isAttack = false;
+            //isAttackMotion = true; // 모션은 무조건 false에만 나오는것이 가능
             FindNewEnemy();
-            ChangeCurState(UnitState.Idle);
-            return;
         }
+    }
+
+    public void CheckCurHp()
+    {
+        hpBarImage.fillAmount = (float)this.status.curHp / this.status.finalHp;
     }
 
     private void OnTriggerEnter(Collider unit)
     {
         GameObject checkObject = unit.gameObject;
-
-        int enemyLayerMask = LayerMask.NameToLayer("Enemy");
 
         if (checkObject.layer == enemyLayerMask && !isAttack)
         {

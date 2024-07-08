@@ -6,69 +6,152 @@ using EnumStruct;
 public class SpawnManager : MonoBehaviour
 {
     public PlayerDefine player;
-    public GameObject spawnLocation;
+    public Transform spawnLocation;
     public GameObject outpostTarget;
 
     [SerializeField] private GameObject curOutpost;
 
-    public GameObject outpostTop;
-    public GameObject outpostMiddle;
-    public GameObject outpostBottom;
-
     public GameObject finalTarget;
     //public bool spawntest = false;
 
+    //public bool isEnemy = false; // true : 플레이어 스폰매니저, false : 적 스폰매니저
+
+    // 아군 스폰 목적지 위치
+    public Transform outpostTop;
+    public Transform outpostMiddle;
+    public Transform outpostBottom;
+
+    // 적 스폰 목적지 위치
+    public Transform frontTopPoint;
+    public Transform frontMiddlePoint;
+    public Transform frontBottomPoint;
+    public Transform backTopPoint;
+    public Transform backMiddlePoint;
+    public Transform backBottomPoint;
+
+    // 라인 : 우선 타겟라인
+    public GameObject topLine;
+    public GameObject middleLine;
+    public GameObject bottomLine;
+
     // 프리팹 위치
-    public string prefabPath; 
+    //public string prefabPath; 
 
     void Start()
     {
-        
+        InstantiateSpawnEnemy();
     }
 
     void Update()
     {
-        //CheckPlayer();
+
     }
 
-    //private void CheckPlayer()
-    //{
-    //    if(player == PlayerDefine.Player)
-    //    {
-    //        SpawnPlayerUnit();
-    //    }
-    //    else
-    //    {
-    //        SpawnEnemyUnit();
-    //    }
-    //}
+    public void InstantiateSpawnEnemy()
+    {
+        // 적인 경우에만 실행
+        if (player != PlayerDefine.Enemy)
+        {
+            return;
+        }
+        // 앞 : 오크 3, 궁병 1
+        // 뒤 : 오크 5, 궁병 3
+        // 센터 : 파괴자
+        // 앞열
+        SpawnUnitPosition(EnemyUnitType.Orc, frontTopPoint, LineType.Top, 3);
+        SpawnUnitPosition(EnemyUnitType.BoneArcher, frontTopPoint, LineType.Top, 1);
+        //SpawnUnitPosition(EnemyUnitType.Orc, frontMiddlePoint, LineType.Middle, 3);
+        //SpawnUnitPosition(EnemyUnitType.BoneArcher, frontMiddlePoint, LineType.Middle, 1);
+        //SpawnUnitPosition(EnemyUnitType.Orc, frontBottomPoint, LineType.Bottom, 3);
+        //SpawnUnitPosition(EnemyUnitType.BoneArcher, frontBottomPoint, LineType.Bottom, 1);
+
+        // 뒷열
+        //SpawnUnitPosition(EnemyUnitType.Orc, backTopPoint, LineType.Top, 5);
+        //SpawnUnitPosition(EnemyUnitType.BoneArcher, backTopPoint, LineType.Top, 3);
+        //SpawnUnitPosition(EnemyUnitType.Orc, backMiddlePoint, LineType.Middle, 5);
+        //SpawnUnitPosition(EnemyUnitType.BoneArcher, backMiddlePoint, LineType.Middle, 3);
+        //SpawnUnitPosition(EnemyUnitType.Orc, backBottomPoint, LineType.Bottom, 5);
+        //SpawnUnitPosition(EnemyUnitType.BoneArcher, backBottomPoint, LineType.Bottom, 3);
+
+        // 스폰포인트
+        SpawnUnitPosition(EnemyUnitType.Destroyer, spawnLocation, LineType.Middle, 1);
+    }
+
+    public void SpawnUnitPosition(EnemyUnitType type, Transform spawnPosition, LineType line, int count)
+    {
+        GameObject prefab;
+        string prefabPath = "";
+        GameObject parentLine = null;
+        //Quaternion quaternion = Quaternion.identity;
+
+        switch (type)
+        {
+            case EnemyUnitType.Orc:
+                prefabPath = "Prefabs/Unit/Unit_Orc";
+                break;
+            case EnemyUnitType.BoneArcher:
+                prefabPath = "Prefabs/Unit/Unit_BoneArcher";
+                break;
+            case EnemyUnitType.Destroyer:
+                prefabPath = "Prefabs/Unit/Unit_Destroyer";
+                break;
+        }
+
+        switch (line)
+        {
+            case LineType.Top:
+                parentLine = topLine;
+                break; 
+            case LineType.Middle: 
+                parentLine = middleLine;
+                break; 
+            case LineType.Bottom: 
+                parentLine = bottomLine;
+                break;
+        }
+
+        prefab = Resources.Load<GameObject>(prefabPath);
+        for(int i = 0; i < count; i++)
+        {
+            Vector3 randomRange = new Vector3(2.0f, 2.0f, 2.0f);
+            Vector3 randomOffset = new Vector3(
+                Random.Range(-randomRange.x, randomRange.x),
+                0,
+                Random.Range(-randomRange.z, randomRange.z)
+            );
+
+            //GameObject unit = Instantiate(prefab, spawnPosition.position + randomOffset, quaternion);
+            GameObject unit = Instantiate(prefab);
+            unit.transform.position = spawnPosition.position + randomOffset;
+            unit.transform.rotation = Quaternion.Euler(0, -90, 0); ;
+            unit.GetComponent<EnemyStatus>().Initialize(type, line, null, finalTarget);
+            unit.transform.SetParent(parentLine.transform);
+        }
+    }
 
     public void SpawnPlayerUnit(int slotNum)
     {
         UnitType type = (UnitType)System.Enum.ToObject(typeof(UnitType), slotNum);
-        Debug.Log("spawn : " + type.ToString());
-
-        //OutPostRow row = (OutPostRow)System.Enum.ToObject(typeof(OutPostRow), slotNum);
-        OutPostRow row = 0;
+        LineType line = 0;
 
         string outpost_name = GameManager.gm_instance.GetPresentOutPost().name;
 
         switch (outpost_name)
         {
             case "Outpost_Top":
-                row = OutPostRow.Top;
+                line = LineType.Top;
                 break;
             case "Outpost_Middle":
-                row = OutPostRow.Middle;
+                line = LineType.Middle;
                 break;
             case "Outpost_Bottom":
-                row = OutPostRow.Bottom;
+                line = LineType.Bottom;
                 break;
         }
 
         if (GameManager.gm_instance.GetPresentOutPost())
         {
-            ChangeUnitTypeSpawn(row, type);
+            ChangeUnitTypeSpawn(line, type);
         }
     }
 
@@ -77,21 +160,23 @@ public class SpawnManager : MonoBehaviour
 
     }
 
-    private void ChangeUnitTypeSpawn(OutPostRow row, UnitType type)
+    private void ChangeUnitTypeSpawn(LineType line, UnitType type)
     {
+        string prefabPath = "";
+
         curOutpost = GameManager.gm_instance.GetPresentOutPost();
 
-        if(row == OutPostRow.Top)
+        if(line == LineType.Top)
         {
-            outpostTarget = outpostTop;
+            outpostTarget = outpostTop.gameObject;
         }
-        else if(row == OutPostRow.Middle)
+        else if(line == LineType.Middle)
         {
-            outpostTarget = outpostMiddle;
+            outpostTarget = outpostMiddle.gameObject;
         }
-        else if(row == OutPostRow.Bottom)
+        else if(line == LineType.Bottom)
         {
-            outpostTarget = outpostBottom;
+            outpostTarget = outpostBottom.gameObject;
         }
 
         if(type == UnitType.Warrior)
@@ -108,9 +193,9 @@ public class SpawnManager : MonoBehaviour
         }        
 
         GameObject prefab = Resources.Load<GameObject>(prefabPath);
-        GameObject instance = Instantiate(prefab, spawnLocation.transform);
+        GameObject instance = Instantiate(prefab, spawnLocation);
         //instance.GetComponent<UnitStatus>().SetUnitType(UnitType.Warrior);
-        instance.GetComponent<UnitStatus>().Initialize(type, row, outpostTarget, finalTarget);
+        instance.GetComponent<UnitStatus>().Initialize(type, line, outpostTarget, finalTarget);
 
         UnitManager.um_instance.RegistUnit(instance, type);
 

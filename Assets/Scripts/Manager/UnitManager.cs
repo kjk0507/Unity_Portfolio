@@ -7,14 +7,22 @@ public class UnitManager : MonoBehaviour
 {
     public static UnitManager um_instance;
 
+    // 아군 리스트
     public List<GameObject> warriorList;
     public List<GameObject> archerList;
     public List<GameObject> wizardList;
 
-    public Transform topLine;
+    // 적 리스트
+    public List<GameObject> orcList;
+    public List<GameObject> boneArcherList;
+    public List<GameObject> destroyerList;
+
+    // 소환된 라인
+    public Transform topLine; 
     public Transform middleLine;
     public Transform bottomLine;
 
+    // 유닛 변경 수치
     public int warrior_equip_hp;
     public int warrior_equip_atk;
     public int warrior_equip_def;
@@ -154,19 +162,19 @@ public class UnitManager : MonoBehaviour
         }
     }
 
-    public Transform FindLine(OutPostRow row)
+    public Transform FindLine(LineType row)
     {
         Transform line = null;
 
         switch (row)
         {
-            case OutPostRow.Top:
+            case LineType.Top:
                 line = topLine;
                 break;
-            case OutPostRow.Middle:
+            case LineType.Middle:
                 line = middleLine;
                 break;
-            case OutPostRow.Bottom:
+            case LineType.Bottom:
                 line = bottomLine;
                 break;
         }

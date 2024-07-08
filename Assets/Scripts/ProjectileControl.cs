@@ -13,10 +13,15 @@ public class ProjectileControl : MonoBehaviour
     public float curSpeed;
     public Rigidbody ri;
 
+    int playerLayerMask;
+    int enemyLayerMask;
+
     bool isDamage = false;
+
     void Start()
     {
         ri = GetComponent<Rigidbody>();
+        
         Destroy(gameObject, 5f);
     }
 
@@ -26,14 +31,25 @@ public class ProjectileControl : MonoBehaviour
         DamageUnit();
     }
 
-
     public void Initialize(GameObject target, DamageType damageType, PlayerDefine playerDefine, float attackSpeed, int damage)
     {
+        playerLayerMask = LayerMask.NameToLayer("Player");
+        enemyLayerMask = LayerMask.NameToLayer("Enemy");
+
         curTarget = target;
         curDamage = damage;
         curDamageType = damageType;
         curDefine = playerDefine;
         curSpeed = attackSpeed;
+
+        if(playerDefine == PlayerDefine.Player) 
+        {
+            this.gameObject.layer = playerLayerMask;
+        }
+        else
+        {
+            this.gameObject.layer = enemyLayerMask;
+        }
     }
 
     public void Shoot()
@@ -80,9 +96,11 @@ public class ProjectileControl : MonoBehaviour
     private void OnTriggerEnter(Collider unit)
     {
         GameObject checkObject = unit.gameObject;
+        int enemyLayerMask = LayerMask.NameToLayer("Enemy");
+        int playerUnitLayerMask = LayerMask.NameToLayer("Player");
 
         // 단일 공격일시
-        if(curDamageType == DamageType.Target)
+        if (curDamageType == DamageType.Target)
         {
             if(curTarget == checkObject)
             {
@@ -104,24 +122,18 @@ public class ProjectileControl : MonoBehaviour
         {
             if (curDefine == PlayerDefine.Player)
             {
-                if (checkObject.layer.Equals("Enemy"))
+                if (checkObject.layer == enemyLayerMask)
                 {
                     targetList.Add(checkObject);
                 }
             }
             else
             {
-                if (curTarget.CompareTag("FriendlyUnit"))
+                if (checkObject.layer == playerUnitLayerMask)
                 {
                     targetList.Add(checkObject);
                 }
             }
-
         }
-
-        //if (!checkObject.layer.Equals("FriendlyUnit"))
-        //{
-        //    Destroy(gameObject);
-        //}
     }
 }
