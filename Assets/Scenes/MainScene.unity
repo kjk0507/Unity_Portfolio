@@ -6852,6 +6852,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1610663017}
   m_CullTransparentMesh: 1
+--- !u!1 &1612032998
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1612032999}
+  m_Layer: 0
+  m_Name: FirePosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1612032999
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1612032998}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0.4, y: 4, z: 3.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &1620373531
 GameObject:
   m_ObjectHideFlags: 0
@@ -7149,15 +7180,15 @@ MonoBehaviour:
   middleLine: {fileID: 1620373532}
   bottomLine: {fileID: 930515559}
   warrior_equip_hp: 0
-  warrior_equip_atk: 60
+  warrior_equip_atk: 0
   warrior_equip_def: 0
   warrior_equip_speed: 0
   warrior_upgrade_hp: 0
   warrior_upgrade_atk: 0
   warrior_upgrade_def: 0
-  warrior_upgrade_speed: 20
+  warrior_upgrade_speed: 30
   archer_equip_hp: 0
-  archer_equip_atk: 60
+  archer_equip_atk: 0
   archer_equip_def: 0
   archer_equip_speed: 0
   archer_upgrade_hp: 0
@@ -9205,3 +9236,4 @@ SceneRoots:
   - {fileID: 1910832403}
   - {fileID: 296440185}
   - {fileID: 189493428}
+  - {fileID: 1612032999}

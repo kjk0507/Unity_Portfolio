@@ -58,26 +58,26 @@ public class SpawnManager : MonoBehaviour
         // 뒤 : 오크 5, 궁병 3
         // 센터 : 파괴자
         // 앞열
-        SpawnUnitPosition(EnemyUnitType.Orc, frontTopPoint, LineType.Top, 3);
-        SpawnUnitPosition(EnemyUnitType.BoneArcher, frontTopPoint, LineType.Top, 1);
-        //SpawnUnitPosition(EnemyUnitType.Orc, frontMiddlePoint, LineType.Middle, 3);
-        //SpawnUnitPosition(EnemyUnitType.BoneArcher, frontMiddlePoint, LineType.Middle, 1);
-        //SpawnUnitPosition(EnemyUnitType.Orc, frontBottomPoint, LineType.Bottom, 3);
-        //SpawnUnitPosition(EnemyUnitType.BoneArcher, frontBottomPoint, LineType.Bottom, 1);
+        SpawnUnitPosition(UnitType.Orc, frontTopPoint, LineType.Top, 3);
+        SpawnUnitPosition(UnitType.BoneArcher, frontTopPoint, LineType.Top, 1);
+        //SpawnUnitPosition(UnitType.Orc, frontMiddlePoint, LineType.Middle, 3);
+        //SpawnUnitPosition(UnitType.BoneArcher, frontMiddlePoint, LineType.Middle, 1);
+        //SpawnUnitPosition(UnitType.Orc, frontBottomPoint, LineType.Bottom, 3);
+        //SpawnUnitPosition(UnitType.BoneArcher, frontBottomPoint, LineType.Bottom, 1);
 
         // 뒷열
-        //SpawnUnitPosition(EnemyUnitType.Orc, backTopPoint, LineType.Top, 5);
-        //SpawnUnitPosition(EnemyUnitType.BoneArcher, backTopPoint, LineType.Top, 3);
-        //SpawnUnitPosition(EnemyUnitType.Orc, backMiddlePoint, LineType.Middle, 5);
-        //SpawnUnitPosition(EnemyUnitType.BoneArcher, backMiddlePoint, LineType.Middle, 3);
-        //SpawnUnitPosition(EnemyUnitType.Orc, backBottomPoint, LineType.Bottom, 5);
-        //SpawnUnitPosition(EnemyUnitType.BoneArcher, backBottomPoint, LineType.Bottom, 3);
+        //SpawnUnitPosition(UnitType.Orc, backTopPoint, LineType.Top, 5);
+        //SpawnUnitPosition(UnitType.BoneArcher, backTopPoint, LineType.Top, 3);
+        //SpawnUnitPosition(UnitType.Orc, backMiddlePoint, LineType.Middle, 5);
+        //SpawnUnitPosition(UnitType.BoneArcher, backMiddlePoint, LineType.Middle, 3);
+        //SpawnUnitPosition(UnitType.Orc, backBottomPoint, LineType.Bottom, 5);
+        //SpawnUnitPosition(UnitType.BoneArcher, backBottomPoint, LineType.Bottom, 3);
 
         // 스폰포인트
-        SpawnUnitPosition(EnemyUnitType.Destroyer, spawnLocation, LineType.Middle, 1);
+        SpawnUnitPosition(UnitType.Destroyer, spawnLocation, LineType.Middle, 1);
     }
 
-    public void SpawnUnitPosition(EnemyUnitType type, Transform spawnPosition, LineType line, int count)
+    public void SpawnUnitPosition(UnitType type, Transform spawnPosition, LineType line, int count)
     {
         GameObject prefab;
         string prefabPath = "";
@@ -86,13 +86,13 @@ public class SpawnManager : MonoBehaviour
 
         switch (type)
         {
-            case EnemyUnitType.Orc:
+            case UnitType.Orc:
                 prefabPath = "Prefabs/Unit/Unit_Orc";
                 break;
-            case EnemyUnitType.BoneArcher:
+            case UnitType.BoneArcher:
                 prefabPath = "Prefabs/Unit/Unit_BoneArcher";
                 break;
-            case EnemyUnitType.Destroyer:
+            case UnitType.Destroyer:
                 prefabPath = "Prefabs/Unit/Unit_Destroyer";
                 break;
         }
@@ -135,6 +135,11 @@ public class SpawnManager : MonoBehaviour
         LineType line = 0;
 
         string outpost_name = GameManager.gm_instance.GetPresentOutPost().name;
+
+        if(outpost_name == null)
+        {
+            return;
+        }
 
         switch (outpost_name)
         {

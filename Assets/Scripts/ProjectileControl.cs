@@ -21,7 +21,10 @@ public class ProjectileControl : MonoBehaviour
     void Start()
     {
         ri = GetComponent<Rigidbody>();
-        
+
+        playerLayerMask = LayerMask.NameToLayer("Player");
+        enemyLayerMask = LayerMask.NameToLayer("Enemy");
+
         Destroy(gameObject, 5f);
     }
 
@@ -33,9 +36,6 @@ public class ProjectileControl : MonoBehaviour
 
     public void Initialize(GameObject target, DamageType damageType, PlayerDefine playerDefine, float attackSpeed, int damage)
     {
-        playerLayerMask = LayerMask.NameToLayer("Player");
-        enemyLayerMask = LayerMask.NameToLayer("Enemy");
-
         curTarget = target;
         curDamage = damage;
         curDamageType = damageType;
@@ -71,21 +71,10 @@ public class ProjectileControl : MonoBehaviour
 
             if(list != null)
             {
-                if(curDefine == PlayerDefine.Player)
+                foreach (GameObject unit in list)
                 {
-                    foreach (GameObject unit in list)
-                    {
-                        unit.GetComponent<EnemyStatus>().status.Damage(curDamage);
-                        targetList.Remove(unit);
-                    }
-                }
-                else if(curDefine == PlayerDefine.Enemy)
-                {
-                    foreach (GameObject unit in list)
-                    {
-                        unit.GetComponent<UnitStatus>().status.Damage(curDamage);
-                        targetList.Remove(unit);
-                    }
+                    unit.GetComponent<InheriteStatus>().status.Damage(curDamage);
+                    targetList.Remove(unit);
                 }
             }
 
@@ -104,17 +93,8 @@ public class ProjectileControl : MonoBehaviour
         {
             if(curTarget == checkObject)
             {
-                // 플레이어의 공격이면 몬스터에게 데미지
-                if (curDefine == PlayerDefine.Player)
-                {
-                    checkObject.GetComponent<EnemyStatus>().status.Damage(curDamage);
-                    Destroy(gameObject);
-                }
-                else
-                {
-                    checkObject.GetComponent<UnitStatus>().status.Damage(curDamage);
-                    Destroy(gameObject);
-                }
+                checkObject.GetComponent<InheriteStatus>().status.Damage(curDamage);
+                Destroy(gameObject);
             }
         }
         // 광역 공격일시

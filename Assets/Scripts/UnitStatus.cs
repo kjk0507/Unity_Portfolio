@@ -20,12 +20,12 @@ public class UnitStatus : InheriteStatus
         CheckCurHp();
         //TestDebugRay();
         CheckTargetDeath();
-        SelectAction();
+        //SelectAction();
     }
 
     private void FixedUpdate()
     {
-        //SelectAction();
+        SelectAction();
     }
 
     public void Attacking()
@@ -74,32 +74,4 @@ public class UnitStatus : InheriteStatus
                 return;
         }
     }
-
-    public void Dying()
-    {
-        // 죽는 애니메이션 끝에 호출
-        // 오브젝트 삭제
-        //string tag = this.gameObject.tag;
-        UnitType unitType = this.unitType;
-
-        switch (unitType)
-        {
-            case UnitType.Warrior:
-                UnitManager.um_instance.warriorList.Remove(gameObject);
-                break;
-            case UnitType.Archer:
-                UnitManager.um_instance.archerList.Remove(gameObject);
-                break;
-            case UnitType.Wizard:
-                UnitManager.um_instance.wizardList.Remove(gameObject);
-                break;
-        }
-        
-        Destroy(gameObject);
-    }
-
-    public void DamageToEnemy()
-    {
-        status.curTarget.GetComponent<EnemyStatus>().status.Damage(this.status.finalAtk);
-    }    
 }

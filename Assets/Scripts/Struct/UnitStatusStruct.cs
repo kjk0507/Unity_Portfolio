@@ -71,13 +71,7 @@ namespace UnitStatusStruct
                 this.attackRange = 35f;
                 this.attackSpeed= 35f;
             }
-
-            ChangeStatus(unitType);
-        }
-
-        public Status(EnemyUnitType type)
-        {
-            if (type == EnemyUnitType.Orc)
+            else if (unitType == UnitType.Orc)
             {
                 this.name = "Orc";
                 this.curHp = 100;
@@ -87,7 +81,7 @@ namespace UnitStatusStruct
                 this.attackRange = 8f;
                 this.attackSpeed = 1f;
             }
-            else if (type == EnemyUnitType.BoneArcher)
+            else if (unitType == UnitType.BoneArcher)
             {
                 this.name = "BoneArcher";
                 this.curHp = 70;
@@ -98,7 +92,7 @@ namespace UnitStatusStruct
                 this.attackSpeed = 50f;
 
             }
-            else if (type == EnemyUnitType.Destroyer)
+            else if (unitType == UnitType.Destroyer)
             {
                 this.name = "Destroyer";
                 this.curHp = 200;
@@ -108,7 +102,7 @@ namespace UnitStatusStruct
                 this.attackRange = 8f;
                 this.attackSpeed = 35f;
             }
-            else if (type == EnemyUnitType.Door)
+            else if (unitType == UnitType.Door)
             {
                 this.name = "Door";
                 this.curHp = 1000;
@@ -118,7 +112,7 @@ namespace UnitStatusStruct
                 this.attackRange = 0f;
                 this.attackSpeed = 0f;
             }
-            else if (type == EnemyUnitType.Tower)
+            else if (unitType == UnitType.Tower)
             {
                 this.name = "Tower";
                 this.curHp = 500;
@@ -129,28 +123,31 @@ namespace UnitStatusStruct
                 this.attackSpeed = 0f;
             }
 
-            ChangeStatus(type);
+            ChangeStatus(unitType);
         }
+
 
         private void ChangeStatus(UnitType unitType)
         {
-            this.finalHp = UnitManager.um_instance.GetExtraHp(unitType) + curHp;
-            this.finalAtk = UnitManager.um_instance.GetExtraAtk(unitType) + curAtk;
-            this.finalDef = UnitManager.um_instance.GetExtraDef(unitType) + curDef;
-            this.finalSpeed = UnitManager.um_instance.GetExtraSpeed(unitType) + curSpeed;
+            if (unitType == UnitType.Warrior || unitType == UnitType.Archer || unitType == UnitType.Wizard)
+            {
+                this.finalHp = UnitManager.um_instance.GetExtraHp(unitType) + curHp;
+                this.finalAtk = UnitManager.um_instance.GetExtraAtk(unitType) + curAtk;
+                this.finalDef = UnitManager.um_instance.GetExtraDef(unitType) + curDef;
+                this.finalSpeed = UnitManager.um_instance.GetExtraSpeed(unitType) + curSpeed;
 
-            this.curHp = this.finalHp;
-            this.curAtk = this.finalAtk;
-            this.curDef = this.finalDef;
-            this.curSpeed = this.finalSpeed;
-        }
-
-        private void ChangeStatus(EnemyUnitType unitType)
-        {
-            this.finalHp = curHp;
-            this.finalAtk = curAtk;
-            this.finalDef = curDef;
-            this.finalSpeed = curSpeed;
+                this.curHp = this.finalHp;
+                this.curAtk = this.finalAtk;
+                this.curDef = this.finalDef;
+                this.curSpeed = this.finalSpeed;
+            }
+            else
+            {
+                this.finalHp = curHp;
+                this.finalAtk = curAtk;
+                this.finalDef = curDef;
+                this.finalSpeed = curSpeed;
+            }
         }
 
         public void Damage(int attackPoint)

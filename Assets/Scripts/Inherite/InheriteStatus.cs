@@ -17,7 +17,7 @@ public class InheriteStatus : MonoBehaviour
     public Transform firePosition;
     public Image hpBarImage;
 
-    bool isAttack = false; // 실제 공격중
+    public bool isAttack = false; // 실제 공격중
     bool isTargetDeath = false; // 타겟의 생존 여부 false : 생존
     public bool isAttackMotion = false; // true : 모션 실행중 / false : 모션 실행 안하는중
 
@@ -171,16 +171,48 @@ public class InheriteStatus : MonoBehaviour
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.constraints = RigidbodyConstraints.FreezePosition;
     }
-    
-    //public void TestDebugRay()
-    //{
-    //    Vector3 direction = (this.status.curTarget.transform.position - firePosition.position);
-    //    Quaternion quaternion = Quaternion.LookRotation(direction);
 
-    //    RaycastHit hit;
-    //    Physics.Raycast(gameObject.transform.position, gameObject.transform.forward, out hit, 1f);
-    //    Debug.DrawRay(firePosition.position, firePosition.right * this.status.attackRange, Color.red);
-    //}
+    public void TestDebugRay()
+    {
+        //Vector3 direction = (this.status.curTarget.transform.position - firePosition.position);
+        //Quaternion quaternion = Quaternion.LookRotation(direction);
+
+        //RaycastHit hit;
+        //Physics.Raycast(gameObject.transform.position, gameObject.transform.forward, out hit, 1f);
+        Debug.DrawRay(transform.position, transform.forward * this.status.attackRange, Color.red);
+    }
+
+    public void Dying()
+    {
+        // 죽는 애니메이션 끝에 호출
+        // 오브젝트 삭제
+        //string tag = this.gameObject.tag;
+        UnitType unitType = this.unitType;
+
+        switch (unitType)
+        {
+            case UnitType.Warrior:
+                UnitManager.um_instance.warriorList.Remove(gameObject);
+                break;
+            case UnitType.Archer:
+                UnitManager.um_instance.archerList.Remove(gameObject);
+                break;
+            case UnitType.Wizard:
+                UnitManager.um_instance.wizardList.Remove(gameObject);
+                break;
+            case UnitType.Orc:
+                UnitManager.um_instance.orcList.Remove(gameObject);
+                break;
+            case UnitType.BoneArcher:
+                UnitManager.um_instance.boneArcherList.Remove(gameObject);
+                break;
+            case UnitType.Destroyer:
+                UnitManager.um_instance.destroyerList.Remove(gameObject);
+                break;
+        }
+
+        Destroy(gameObject);
+    }
 
     public void EndAttackMotion()
     {
@@ -213,8 +245,8 @@ public class InheriteStatus : MonoBehaviour
                 continue;
             }
 
-            int enemyLayerMask = LayerMask.NameToLayer("Player");
-            if (unit.gameObject.layer == enemyLayerMask)
+            //int enemyLayerMask = LayerMask.NameToLayer("Player");
+            if (unit.gameObject.layer != enemyLayerMask)
             {
                 continue;
             }
@@ -284,12 +316,17 @@ public class InheriteStatus : MonoBehaviour
         }
     }
 
+    public void DamageToEnemy()
+    {
+        status.curTarget.GetComponent<InheriteStatus>().status.Damage(this.status.finalAtk);
+    }
+
     public void CheckCurHp()
     {
         hpBarImage.fillAmount = (float)this.status.curHp / this.status.finalHp;
     }
 
-    private void OnTriggerEnter(Collider unit)
+    private void OnCollisionEnter(Collision unit)
     {
         GameObject checkObject = unit.gameObject;
 

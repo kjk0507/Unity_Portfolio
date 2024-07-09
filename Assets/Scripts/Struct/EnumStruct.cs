@@ -31,7 +31,12 @@ namespace EnumStruct
     {
         Warrior,
         Archer,
-        Wizard
+        Wizard,
+        Orc,
+        BoneArcher,
+        Destroyer,
+        Tower,
+        Door,
     }
 
     public enum LineType
@@ -39,15 +44,6 @@ namespace EnumStruct
         Top,
         Middle,
         Bottom,
-    }
-
-    public enum EnemyUnitType
-    {        
-        Orc,
-        BoneArcher,
-        Destroyer,
-        Tower,
-        Door,
     }
 
     public enum DamageType
