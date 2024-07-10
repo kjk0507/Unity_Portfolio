@@ -1,17 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnitStatusStruct;
 using EnumStruct;
-using UnityEngine.UI;
-
 
 public class UnitStatus : InheriteStatus
 {
     private void Start()
     {
+        playerDefine = PlayerDefine.Player;
         animator = GetComponent<Animator>();
         enemyLayerMask = LayerMask.NameToLayer("Enemy");
+        findLayerMask = LayerMask.GetMask("Enemy");
     }
 
     private void Update()

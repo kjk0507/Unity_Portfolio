@@ -33,6 +33,9 @@ namespace UnitStatusStruct
         //public GameObject priorityTarget; // 충돌한 타겟
         public GameObject finalTarget;
 
+        // 이동 여부
+        public MoveType moveType;
+
         public Status()
         {
 
@@ -47,8 +50,9 @@ namespace UnitStatusStruct
                 this.curAtk = 10;
                 this.curDef = 0;
                 this.curSpeed = 10;
-                this.attackRange = 8f;
+                this.attackRange = 10f;
                 this.attackSpeed = 1f;
+                this.moveType = MoveType.Move;
             }
             else if(unitType == UnitType.Archer)
             {
@@ -59,6 +63,7 @@ namespace UnitStatusStruct
                 this.curSpeed = 6;
                 this.attackRange = 20f;
                 this.attackSpeed = 50f;
+                this.moveType = MoveType.Move;
 
             }
             else if(unitType == UnitType.Wizard)
@@ -70,6 +75,7 @@ namespace UnitStatusStruct
                 this.curSpeed = 3;
                 this.attackRange = 35f;
                 this.attackSpeed= 35f;
+                this.moveType = MoveType.Move;
             }
             else if (unitType == UnitType.Orc)
             {
@@ -80,6 +86,7 @@ namespace UnitStatusStruct
                 this.curSpeed = 10;
                 this.attackRange = 8f;
                 this.attackSpeed = 1f;
+                this.moveType = MoveType.Move;
             }
             else if (unitType == UnitType.BoneArcher)
             {
@@ -90,7 +97,7 @@ namespace UnitStatusStruct
                 this.curSpeed = 6;
                 this.attackRange = 20f;
                 this.attackSpeed = 50f;
-
+                this.moveType = MoveType.Move;
             }
             else if (unitType == UnitType.Destroyer)
             {
@@ -99,8 +106,9 @@ namespace UnitStatusStruct
                 this.curAtk = 50;
                 this.curDef = 0;
                 this.curSpeed = 6;
-                this.attackRange = 8f;
+                this.attackRange = 20f;
                 this.attackSpeed = 35f;
+                this.moveType = MoveType.Move;
             }
             else if (unitType == UnitType.Door)
             {
@@ -108,9 +116,10 @@ namespace UnitStatusStruct
                 this.curHp = 1000;
                 this.curAtk = 0;
                 this.curDef = 0;
-                this.curSpeed = 3;
+                this.curSpeed = 0;
                 this.attackRange = 0f;
                 this.attackSpeed = 0f;
+                this.moveType = MoveType.Stand;
             }
             else if (unitType == UnitType.Tower)
             {
@@ -121,6 +130,7 @@ namespace UnitStatusStruct
                 this.curSpeed = 3;
                 this.attackRange = 50f;
                 this.attackSpeed = 0f;
+                this.moveType = MoveType.Stand;
             }
 
             ChangeStatus(unitType);

@@ -1,14 +1,18 @@
-using EnumStruct;
 using UnityEngine;
-using UnitStatusStruct;
-using UnityEngine.UI;
+using EnumStruct;
+using System.Collections.Generic;
 
 public class EnemyStatus : InheriteStatus
 {
     private void Start()
     {
-        animator = GetComponent<Animator>();
+        playerDefine = PlayerDefine.Enemy;
+        if (this.status.moveType == MoveType.Move)
+        {
+            animator = GetComponent<Animator>();
+        }
         enemyLayerMask = LayerMask.NameToLayer("Player");
+        findLayerMask = LayerMask.GetMask("Player");
     }
 
     private void Update()
@@ -59,22 +63,19 @@ public class EnemyStatus : InheriteStatus
                 arrow.GetComponent<ProjectileControl>().Initialize(this.status.curTarget, DamageType.Target, PlayerDefine.Enemy, this.status.attackSpeed, this.status.finalAtk);
                 break;
             case UnitType.Destroyer:
-                // 불덩이 소환
-                // 데미지는 다른 스크립트, 불덩이는 파티클 만들어보기
-                transform.LookAt(this.status.curTarget.transform);
+                List<GameObject> DamageList = new List<GameObject>();
 
-                prefabPath = "Prefabs/Skill/Fireball";
-                prefab = Resources.Load<GameObject>(prefabPath);
+                Collider[] hitColliders = Physics.OverlapSphere(firePosition.position, 20f, findLayerMask);                
 
-                quaternion = Quaternion.identity;
+                foreach (Collider unitCollider in hitColliders)
+                {
+                    DamageList.Add(unitCollider.gameObject);
+                }
 
-                //Vector3 direction = (this.status.curTarget.transform.position - firePosition.position).normalized;
-                direction = firePosition.forward;
-                rotation = Quaternion.LookRotation(direction);
-
-                GameObject fireball = Instantiate(prefab, firePosition.position, quaternion);
-                fireball.transform.rotation = rotation;
-                fireball.GetComponent<ProjectileControl>().Initialize(this.status.curTarget, DamageType.AOE, PlayerDefine.Player, this.status.attackSpeed, this.status.finalAtk);
+                foreach (GameObject unit in DamageList)
+                {
+                    unit.GetComponent<InheriteStatus>().status.Damage(this.status.finalAtk);
+                }
                 break;
             default:
                 return;

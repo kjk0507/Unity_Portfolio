@@ -51,4 +51,16 @@ namespace EnumStruct
         Target,
         AOE,
     }
+
+    public enum SpawnType
+    {
+        IniInitial,
+        Spawn
+    }
+
+    public enum MoveType
+    {
+        Stand,
+        Move
+    }
 }

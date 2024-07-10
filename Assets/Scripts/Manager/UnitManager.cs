@@ -181,4 +181,43 @@ public class UnitManager : MonoBehaviour
 
         return line;
     }
+
+    public int CheckLineNum(LineType type)
+    {
+        int layerMask = LayerMask.NameToLayer("Enemy");
+        int num = 0;
+
+        switch (type)
+        {
+            case LineType.Top:
+                foreach (Transform obj in topLine)
+                {
+                    if (obj.gameObject.layer == layerMask)
+                    {
+                        num++;
+                    }                    
+                }
+                break; 
+            case LineType.Middle:
+                foreach (Transform obj in middleLine)
+                {
+                    if (obj.gameObject.layer == layerMask)
+                    {
+                        num++;
+                    }
+                }
+                break; 
+            case LineType.Bottom:
+                foreach (Transform obj in bottomLine)
+                {
+                    if (obj.gameObject.layer == layerMask)
+                    {
+                        num++;
+                    }
+                }
+                break;
+        }
+
+        return num;
+    }
 }

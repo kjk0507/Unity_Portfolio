@@ -1,14 +1,13 @@
 using EnumStruct;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnitStatusStruct;
 using UnityEngine.UI;
-using Unity.VisualScripting;
 
 public class InheriteStatus : MonoBehaviour
 {
+    public PlayerDefine playerDefine;
     public UnitType unitType;
+    public SpawnType spawnType;
     public Status status;
     public UnitState curState;
     protected Animator animator;
@@ -22,9 +21,11 @@ public class InheriteStatus : MonoBehaviour
     public bool isAttackMotion = false; // true : 모션 실행중 / false : 모션 실행 안하는중
 
     public int enemyLayerMask;
+    public int findLayerMask;
 
     void Start()
     {
+
     }
 
     void hpCurse()
@@ -42,11 +43,12 @@ public class InheriteStatus : MonoBehaviour
 
     }
 
-    public void Initialize(UnitType type, LineType row, GameObject curTarget, GameObject finalTarget)
+    public void Initialize(UnitType type, LineType row, SpawnType spawn,GameObject curTarget, GameObject finalTarget)
     {
         status = new Status(type);
 
         unitType = type;
+        spawnType = spawn;
         this.status.curRow = row;
         this.status.curTarget = curTarget;
         this.status.finalTarget = finalTarget;
@@ -83,6 +85,12 @@ public class InheriteStatus : MonoBehaviour
     public void ChangeCurState(UnitState state)
     {
         curState = state;
+
+        if (this.status.moveType == MoveType.Stand)
+        {
+            return;
+        }
+
         animator.SetInteger("unitState", (int)curState);
         animator.SetBool("isAttackMotion", isAttackMotion);
     }
@@ -96,9 +104,17 @@ public class InheriteStatus : MonoBehaviour
         // 목표가 있다면 이동 -> 이동에서 공격
         if (this.status.curTarget != null)
         {
+            float distance = Vector3.Distance(this.status.curTarget.transform.position, transform.position);
+
+            // 초기 적이라면 많이 움직이지 않기
+            if (playerDefine == PlayerDefine.Enemy && distance >= 35f && spawnType == SpawnType.IniInitial) // 35가 가장 먼 공격임
+            {
+                return;
+            }
+
             ChangeCurState(UnitState.Move);
             return;
-        }
+        }        
     }
 
     public void ActionMove()
@@ -106,6 +122,13 @@ public class InheriteStatus : MonoBehaviour
         // 타겟과 거리 측정 후 사정거리 안에 들어오는 경우에 공격으로 전환
         // 아니라면 이동 실행
         GameObject curTarget = this.status.curTarget;
+
+        if (this.status.moveType == MoveType.Stand)
+        {
+            ChangeCurState(UnitState.Attack);
+            return;
+        }
+
 
         if (this.status.curTarget != null)
         {
@@ -132,6 +155,11 @@ public class InheriteStatus : MonoBehaviour
             if(isAttackMotion)
             {
                 isAttackMotion = false;
+                if (this.status.moveType == MoveType.Stand)
+                {
+                    ChangeCurState(UnitState.Idle);
+                    return;
+                }
                 animator.SetBool("isAttackMotion", false);
                 ChangeCurState(UnitState.Idle);
                 return;
@@ -164,6 +192,12 @@ public class InheriteStatus : MonoBehaviour
 
     public void ActionDeath()
     {
+        if(this.status.moveType == MoveType.Stand)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         Collider collider = GetComponent<Collider>();
         Destroy(collider);
 
@@ -179,7 +213,36 @@ public class InheriteStatus : MonoBehaviour
 
         //RaycastHit hit;
         //Physics.Raycast(gameObject.transform.position, gameObject.transform.forward, out hit, 1f);
-        Debug.DrawRay(transform.position, transform.forward * this.status.attackRange, Color.red);
+        Debug.DrawRay(transform.position, transform.forward * this.status.attackRange, UnityEngine.Color.red);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (firePosition != null)
+        {
+            Gizmos.color = UnityEngine.Color.blue;
+            DrawCircle(firePosition.position, 20f);
+        }
+    }
+
+    void DrawCircle(Vector3 position, float radius)
+    {
+        int segments = 100;
+        float angle = 0f;
+
+        Vector3 lastPoint = position + new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;
+        Vector3 nextPoint = Vector3.zero;
+
+        for (int i = 1; i <= segments; i++)
+        {
+            angle += 2 * Mathf.PI / segments;
+            nextPoint.x = position.x + Mathf.Cos(angle) * radius;
+            nextPoint.z = position.z + Mathf.Sin(angle) * radius;
+            nextPoint.y = position.y;
+
+            Gizmos.DrawLine(lastPoint, nextPoint);
+            lastPoint = nextPoint;
+        }
     }
 
     public void Dying()
@@ -217,6 +280,12 @@ public class InheriteStatus : MonoBehaviour
     public void EndAttackMotion()
     {
         isAttackMotion = false;
+
+
+        if (this.status.curTarget != null && this.status.curTarget.GetComponent<InheriteStatus>().status.moveType == MoveType.Stand)
+        {
+            FindNewEnemy();
+        }
     }
 
     public void FindNewEnemy()
@@ -281,7 +350,7 @@ public class InheriteStatus : MonoBehaviour
             // 레이어를 통한 적 탐지 방법
             float searchRadius = 50f;
             Vector3 currentPosition = transform.position;
-            Collider[] colliders = Physics.OverlapSphere(currentPosition, searchRadius, enemyLayerMask);
+            Collider[] colliders = Physics.OverlapSphere(currentPosition, searchRadius, findLayerMask);
             //Collider closestEnemy = null;
             //float closestDistanceSqr = Mathf.Infinity;
 
@@ -304,6 +373,7 @@ public class InheriteStatus : MonoBehaviour
         if (this.status.curTarget == null || this.status.curTarget.GetComponent<Collider>() == null)
         {
             isTargetDeath = true;
+            //animator.SetInteger("unitState", (int)UnitState.Idle);
         }
 
         // 타겟 사망시
@@ -318,6 +388,10 @@ public class InheriteStatus : MonoBehaviour
 
     public void DamageToEnemy()
     {
+        if(this.status.curTarget == null)
+        {
+            return;
+        }
         status.curTarget.GetComponent<InheriteStatus>().status.Damage(this.status.finalAtk);
     }
 
