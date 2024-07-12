@@ -1,3 +1,4 @@
+using EnumStruct;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -54,10 +55,56 @@ public class UIManager : MonoBehaviour
                 //    clickable.OnClick();
                 //}
 
-                if(clickedObject.tag == "Outpost")
+                //if(clickedObject.tag == "Outpost")
+                //{
+                //    GameManager.gm_instance.SetPresentOutPost(clickedObject);
+                //    clickedOutpost.text = clickedObject.name.ToString();
+                //}
+
+                int outPostLayerMask = LayerMask.NameToLayer("OutPost_Check");
+                int outPostButtonLayerMask = LayerMask.NameToLayer("OutPost_Button");
+
+                if (clickedObject.layer == outPostLayerMask)
                 {
-                    GameManager.gm_instance.SetPresentOutPost(clickedObject);
-                    clickedOutpost.text = clickedObject.name.ToString();
+                    string name = clickedObject.transform.parent.name;
+                    if(name == "Point_00" || name == "Point_01" || name == "Point_02" || name == "Point_03")
+                    {
+                        GameManager.gm_instance.SetPresentOutPost(LineType.Top);
+                        clickedOutpost.text = "Top";
+                    }
+                    else if (name == "Point_10" || name == "Point_11" || name == "Point_12" || name == "Point_13")
+                    {
+                        GameManager.gm_instance.SetPresentOutPost(LineType.Middle);
+                        clickedOutpost.text = "Middle";
+                    }
+                    else if (name == "Point_20" || name == "Point_21" || name == "Point_22" || name == "Point_23")
+                    {
+                        GameManager.gm_instance.SetPresentOutPost(LineType.Bottom);
+                        clickedOutpost.text = "Bottom";
+                    }
+                }
+
+                Debug.Log("ClickObject : " + clickedObject.layer);
+                Debug.Log("layermask : " + outPostButtonLayerMask);
+
+
+                if (clickedObject.layer == outPostButtonLayerMask)
+                {
+                    GameObject checkObj = clickedObject.transform.parent.parent.parent.gameObject;
+                    Debug.Log("parent : " + checkObj);
+                    OutPostState outPostState = checkObj.GetComponent<OutpostControl>().CheckOutPostState();
+
+                    switch (outPostState)
+                    {
+                        case OutPostState.InActive:
+                            break;
+                        case OutPostState.Move:
+                            checkObj.GetComponent<OutpostControl>().ChangeOutPostState(OutPostState.Wait);
+                            break;
+                        case OutPostState.Wait:
+                            checkObj.GetComponent<OutpostControl>().ChangeOutPostState(OutPostState.Move);
+                            break;
+                    }
                 }
             }
         }

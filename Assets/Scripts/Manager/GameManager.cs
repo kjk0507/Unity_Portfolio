@@ -1,3 +1,4 @@
+using EnumStruct;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,10 @@ public class GameManager : MonoBehaviour
     public GameObject presentOutpost;
     public int ruby; // 상점 재화
     public int gold; // 인게임 생성 재화
+
+    public GameObject topOutPost;
+    public GameObject middleOutPost;
+    public GameObject bottomOutPost;
 
     void Awake()
     {
@@ -39,9 +44,21 @@ public class GameManager : MonoBehaviour
         return presentOutpost;
     }
 
-    public void SetPresentOutPost(GameObject clickObject)
+    public void SetPresentOutPost(LineType line)
     {
-        presentOutpost = clickObject;
+        //presentOutpost = clickObject;
+        switch (line)
+        {
+            case LineType.Top:
+                presentOutpost = topOutPost;
+                break;
+            case LineType.Middle:
+                presentOutpost = middleOutPost;
+                break;
+            case LineType.Bottom:
+                presentOutpost = bottomOutPost;
+                break;
+        }
     }
 
     public void AddGold()

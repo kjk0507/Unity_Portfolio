@@ -11,15 +11,17 @@ public class EnemyStatus : InheriteStatus
         {
             animator = GetComponent<Animator>();
         }
+        outPostLayerMask = LayerMask.NameToLayer("OutPost");
         enemyLayerMask = LayerMask.NameToLayer("Player");
         findLayerMask = LayerMask.GetMask("Player");
+        ownLayerMask = LayerMask.NameToLayer("Enemy");
     }
 
     private void Update()
     {
         Target = this.status.curTarget;
         CheckCurHp();
-        TestDebugRay();
+        //TestDebugRay();
         CheckTargetDeath();
         //SelectAction();
     }

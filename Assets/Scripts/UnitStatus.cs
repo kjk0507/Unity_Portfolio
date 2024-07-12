@@ -7,8 +7,10 @@ public class UnitStatus : InheriteStatus
     {
         playerDefine = PlayerDefine.Player;
         animator = GetComponent<Animator>();
+        outPostLayerMask = LayerMask.NameToLayer("OutPost");
         enemyLayerMask = LayerMask.NameToLayer("Enemy");
         findLayerMask = LayerMask.GetMask("Enemy");
+        ownLayerMask = LayerMask.NameToLayer("Player");
     }
 
     private void Update()
@@ -18,6 +20,7 @@ public class UnitStatus : InheriteStatus
         //TestDebugRay();
         CheckTargetDeath();
         //SelectAction();
+        //CheckComingEnemy();
     }
 
     private void FixedUpdate()

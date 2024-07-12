@@ -220,4 +220,93 @@ public class UnitManager : MonoBehaviour
 
         return num;
     }
+
+    public int CheckUnitListNum(GameObject obj, UnitType type)
+    {
+        int listNum = 0;
+
+        string name = obj.name;
+
+        OutPostPoint point = ChangPointNum(name);
+
+        switch (type)
+        {
+            case UnitType.Warrior:
+                foreach(GameObject unit in warriorList)
+                {
+                    if(point == unit.GetComponent<InheriteStatus>().curPoint)
+                    {
+                        listNum++;
+                    }                    
+                }
+                break;
+            case UnitType.Archer:
+                foreach (GameObject unit in archerList)
+                {
+                    if (point == unit.GetComponent<InheriteStatus>().curPoint)
+                    {
+                        listNum++;
+                    }
+                }
+                break;
+            case UnitType.Wizard:
+                foreach (GameObject unit in wizardList)
+                {
+                    if (point == unit.GetComponent<InheriteStatus>().curPoint)
+                    {
+                        listNum++;
+                    }
+                }
+                break;
+        }
+
+        return listNum;
+    }
+
+    public OutPostPoint ChangPointNum(string name)
+    {
+        OutPostPoint point = OutPostPoint.None;
+
+        switch (name)
+        {
+            case "Point_00":
+                point = OutPostPoint.Point_00;
+                break;
+            case "Point_01":
+                point = OutPostPoint.Point_01;
+                break;
+            case "Point_02":
+                point = OutPostPoint.Point_02;
+                break;
+            case "Point_03":
+                point = OutPostPoint.Point_03;
+                break;
+            case "Point_10":
+                point = OutPostPoint.Point_10;
+                break;
+            case "Point_11":
+                point = OutPostPoint.Point_11;
+                break;
+            case "Point_12":
+                point = OutPostPoint.Point_12;
+                break;
+            case "Point_13":
+                point = OutPostPoint.Point_13;
+                break;
+            case "Point_20":
+                point = OutPostPoint.Point_20;
+                break;
+            case "Point_21":
+                point = OutPostPoint.Point_21;
+                break;
+            case "Point_22":
+                point = OutPostPoint.Point_22;
+                break;
+            case "Point_23":
+                point = OutPostPoint.Point_23;
+                break;
+        }
+
+        return point;
+    }
 }

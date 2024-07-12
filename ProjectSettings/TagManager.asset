@@ -22,9 +22,9 @@ TagManager:
   - 
   - Player
   - Enemy
-  - FriendlyUnit
-  - 
-  - 
+  - OutPost
+  - OutPost_Check
+  - OutPost_Button
   - 
   - 
   - 

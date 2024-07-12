@@ -17,17 +17,20 @@ public class SpawnManager : MonoBehaviour
     //public bool isEnemy = false; // true : 플레이어 스폰매니저, false : 적 스폰매니저
 
     // 아군 스폰 목적지 위치
-    public Transform outpostTop;
-    public Transform outpostMiddle;
-    public Transform outpostBottom;
+    public Transform point_00;
+    public Transform point_10;
+    public Transform point_20;
 
     // 적 스폰 목적지 위치
-    public Transform frontTopPoint;
-    public Transform frontMiddlePoint;
-    public Transform frontBottomPoint;
-    public Transform backTopPoint;
-    public Transform backMiddlePoint;
-    public Transform backBottomPoint;
+    public Transform point_01;
+    public Transform point_02;
+    public Transform point_03;
+    public Transform point_11;
+    public Transform point_12;
+    public Transform point_13;
+    public Transform point_21;
+    public Transform point_22;
+    public Transform point_23;
 
     // 라인 : 우선 타겟라인
     public GameObject topLine;
@@ -74,18 +77,18 @@ public class SpawnManager : MonoBehaviour
         ResistUnitQueue(UnitType.Destroyer, LineType.Top, 1);
 
         // 중간 라인
-        ResistUnitQueue(UnitType.Orc, LineType.Middle, 3);
-        ResistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
-        ResistUnitQueue(UnitType.Orc, LineType.Middle, 3);
-        ResistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
-        ResistUnitQueue(UnitType.Destroyer, LineType.Middle, 1);
+        //ResistUnitQueue(UnitType.Orc, LineType.Middle, 3);
+        //ResistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
+        //ResistUnitQueue(UnitType.Orc, LineType.Middle, 3);
+        //ResistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
+        //ResistUnitQueue(UnitType.Destroyer, LineType.Middle, 1);
 
         // 밑 라인
-        ResistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
-        ResistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
-        ResistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
-        ResistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
-        ResistUnitQueue(UnitType.Destroyer, LineType.Bottom, 1);
+        //ResistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
+        //ResistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
+        //ResistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
+        //ResistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
+        //ResistUnitQueue(UnitType.Destroyer, LineType.Bottom, 1);
     }
 
     public void ResistUnitQueue(UnitType type, LineType line, int count)
@@ -114,38 +117,28 @@ public class SpawnManager : MonoBehaviour
         {
             return;
         }
-        // 앞 : 오크 3, 궁병 1
-        // 뒤 : 오크 5, 궁병 3
-        // 센터 : 파괴자
-        // 앞열
-        //SpawnUnitPosition(UnitType.Orc, frontTopPoint, LineType.Top, SpawnType.IniInitial, 3);
-        //SpawnUnitPosition(UnitType.BoneArcher, frontTopPoint, LineType.Top, SpawnType.IniInitial, 1);
-        //SpawnUnitPosition(UnitType.Orc, frontMiddlePoint, LineType.Middle, SpawnType.IniInitial, 3);
-        //SpawnUnitPosition(UnitType.BoneArcher, frontMiddlePoint, LineType.Middle, SpawnType.IniInitial, 1);
-        //SpawnUnitPosition(UnitType.Orc, frontBottomPoint, LineType.Bottom, SpawnType.IniInitial, 3);
-        //SpawnUnitPosition(UnitType.BoneArcher, frontBottomPoint, LineType.Bottom, SpawnType.IniInitial, 1);
-        //SpawnUnitPosition(UnitType.Destroyer, frontTopPoint, LineType.Top, SpawnType.IniInitial, 1);
-        SpawnUnitPosition(UnitType.Tower, frontTopPoint, LineType.Top, SpawnType.IniInitial, 1);
-        SpawnUnitPosition(UnitType.Door, backTopPoint, LineType.Top, SpawnType.IniInitial, 1);
 
-        // 뒷열
-        //SpawnUnitPosition(UnitType.Orc, backTopPoint, LineType.Top, SpawnType.IniInitial, 5);
-        //SpawnUnitPosition(UnitType.BoneArcher, backTopPoint, LineType.Top, SpawnType.IniInitial, 3);
-        //SpawnUnitPosition(UnitType.Orc, backMiddlePoint, LineType.Middle, SpawnType.IniInitial, 5);
-        //SpawnUnitPosition(UnitType.BoneArcher, backMiddlePoint, LineType.Middle, SpawnType.IniInitial, 3);
-        //SpawnUnitPosition(UnitType.Orc, backBottomPoint, LineType.Bottom, SpawnType.IniInitial, 5);
-        //SpawnUnitPosition(UnitType.BoneArcher, backBottomPoint, LineType.Bottom, SpawnType.IniInitial, 3);
+        // 01열
+        SpawnUnitPosition(UnitType.Orc, point_01, LineType.Top, SpawnType.IniInitial, 3);
+        SpawnUnitPosition(UnitType.BoneArcher, point_01, LineType.Top, SpawnType.IniInitial, 1);
+
+        //SpawnUnitPosition(UnitType.Orc, point_11, LineType.Middle, SpawnType.IniInitial, 3);
+        //SpawnUnitPosition(UnitType.BoneArcher, point_11, LineType.Middle, SpawnType.IniInitial, 1);
+
+        //SpawnUnitPosition(UnitType.Orc, point_21, LineType.Bottom, SpawnType.IniInitial, 3);
+        //SpawnUnitPosition(UnitType.BoneArcher, point_21, LineType.Bottom, SpawnType.IniInitial, 1);
 
         // 스폰포인트
         //SpawnUnitPosition(UnitType.Destroyer, spawnLocation, LineType.Middle, SpawnType.IniInitial, 1);
     }
 
-    public void SpawnUnitPosition(UnitType type, Transform spawnPosition, LineType line, SpawnType spawnType,int count)
+    public void SpawnUnitPosition(UnitType type, Transform spawnPosition, LineType line, SpawnType spawnType, int count)
     {
         GameObject prefab;
         string prefabPath = "";
         GameObject parentLine = null;
         //Quaternion quaternion = Quaternion.identity;
+        GameObject outPostPoint = null;
 
         switch (type)
         {
@@ -170,12 +163,15 @@ public class SpawnManager : MonoBehaviour
         {
             case LineType.Top:
                 parentLine = topLine;
+                outPostPoint = point_03.gameObject;
                 break; 
             case LineType.Middle: 
                 parentLine = middleLine;
+                outPostPoint = point_13.gameObject;
                 break; 
             case LineType.Bottom: 
                 parentLine = bottomLine;
+                outPostPoint = point_23.gameObject;
                 break;
         }
 
@@ -203,7 +199,7 @@ public class SpawnManager : MonoBehaviour
                 unit.transform.rotation = Quaternion.Euler(0, 0, 0);
             }
 
-            unit.GetComponent<EnemyStatus>().Initialize(type, line, spawnType, null, finalTarget);
+            unit.GetComponent<EnemyStatus>().Initialize(type, line, spawnType, null, outPostPoint, finalTarget);
             unit.transform.SetParent(parentLine.transform);
         }
     }
@@ -222,13 +218,13 @@ public class SpawnManager : MonoBehaviour
 
         switch (outpost_name)
         {
-            case "Outpost_Top":
+            case "Point_00":
                 line = LineType.Top;
                 break;
-            case "Outpost_Middle":
+            case "Point_10":
                 line = LineType.Middle;
                 break;
-            case "Outpost_Bottom":
+            case "Point_20":
                 line = LineType.Bottom;
                 break;
         }
@@ -247,15 +243,18 @@ public class SpawnManager : MonoBehaviour
 
         if(line == LineType.Top)
         {
-            outpostTarget = outpostTop.gameObject;
+            //outpostTarget = outpostTop.gameObject;
+            outpostTarget = point_00.gameObject;
         }
         else if(line == LineType.Middle)
         {
-            outpostTarget = outpostMiddle.gameObject;
+            //outpostTarget = outpostMiddle.gameObject;
+            outpostTarget = point_10.gameObject;
         }
         else if(line == LineType.Bottom)
         {
-            outpostTarget = outpostBottom.gameObject;
+            //outpostTarget = outpostBottom.gameObject;
+            outpostTarget = point_20.gameObject;
         }
 
         if(type == UnitType.Warrior)
@@ -271,10 +270,24 @@ public class SpawnManager : MonoBehaviour
             prefabPath = "Prefabs/Unit/Unit_Wizard";
         }        
 
+
         GameObject prefab = Resources.Load<GameObject>(prefabPath);
         GameObject instance = Instantiate(prefab, spawnLocation);
         //instance.GetComponent<UnitStatus>().SetUnitType(UnitType.Warrior);
-        instance.GetComponent<UnitStatus>().Initialize(type, line, SpawnType.Spawn, outpostTarget, finalTarget);
+        instance.GetComponent<UnitStatus>().Initialize(type, line, SpawnType.Spawn, null, outpostTarget, finalTarget);
+
+        switch (line)
+        {
+            case LineType.Top:
+                instance.transform.SetParent(topLine.transform);
+                break;
+            case LineType.Middle:
+                instance.transform.SetParent(middleLine.transform);
+                break;
+            case LineType.Bottom:
+                instance.transform.SetParent(bottomLine.transform);
+                break;
+        }
 
         UnitManager.um_instance.RegistUnit(instance, type);
 
@@ -282,7 +295,7 @@ public class SpawnManager : MonoBehaviour
 
     public void AutoSpawnEnemyUnit()
     {
-        Debug.Log("topQueue : " + topLineQueue.Count);
+        //Debug.Log("topQueue : " + topLineQueue.Count);
         if (player == PlayerDefine.Player)
         {
             return;

@@ -2,6 +2,7 @@ using EnumStruct;
 using UnityEngine;
 using UnitStatusStruct;
 using UnityEngine.UI;
+using Unity.VisualScripting;
 
 public class InheriteStatus : MonoBehaviour
 {
@@ -15,17 +16,23 @@ public class InheriteStatus : MonoBehaviour
     public GameObject Target;
     public Transform firePosition;
     public Image hpBarImage;
+    public OutPostPoint curPoint;
+    public GameObject targetOutPost;
 
     public bool isAttack = false; // 실제 공격중
     bool isTargetDeath = false; // 타겟의 생존 여부 false : 생존
     public bool isAttackMotion = false; // true : 모션 실행중 / false : 모션 실행 안하는중
 
-    public int enemyLayerMask;
-    public int findLayerMask;
+    public int enemyLayerMask; // 적 레이어(번호)
+    public int findLayerMask; // 적 레이어(충돌)
+    public int ownLayerMask; // 자기 자신의 layer
+    public int outPostLayerMask;
+
+    public bool isPointMove = false; // true : 이동 가능 / false : 이동 불가능 
 
     void Start()
     {
-
+        
     }
 
     void hpCurse()
@@ -43,7 +50,7 @@ public class InheriteStatus : MonoBehaviour
 
     }
 
-    public void Initialize(UnitType type, LineType row, SpawnType spawn,GameObject curTarget, GameObject finalTarget)
+    public void Initialize(UnitType type, LineType row, SpawnType spawn,GameObject curTarget, GameObject point, GameObject finalTarget)
     {
         status = new Status(type);
 
@@ -52,6 +59,8 @@ public class InheriteStatus : MonoBehaviour
         this.status.curRow = row;
         this.status.curTarget = curTarget;
         this.status.finalTarget = finalTarget;
+        this.targetOutPost = point;
+        this.curPoint = CheckOutPostPoint(point);
     }
 
     public void SelectAction()
@@ -104,12 +113,23 @@ public class InheriteStatus : MonoBehaviour
         // 목표가 있다면 이동 -> 이동에서 공격
         if (this.status.curTarget != null)
         {
+            GameObject curTarget = this.status.curTarget;
             float distance = Vector3.Distance(this.status.curTarget.transform.position, transform.position);
 
             // 초기 적이라면 많이 움직이지 않기
             if (playerDefine == PlayerDefine.Enemy && distance >= 35f && spawnType == SpawnType.IniInitial) // 35가 가장 먼 공격임
             {
                 return;
+            }
+
+            if (playerDefine == PlayerDefine.Player && curPoint != OutPostPoint.None)
+            {
+                float distancePoint = Vector3.Distance(this.targetOutPost.transform.position, transform.position);
+
+                if (distancePoint < 3)
+                {
+                    return;
+                }
             }
 
             ChangeCurState(UnitState.Move);
@@ -134,15 +154,55 @@ public class InheriteStatus : MonoBehaviour
         {
             float distance = Vector3.Distance(curTarget.transform.position, transform.position);
 
-            if (curTarget.tag == "Outpost")
-            {
-                // 초기 전초기지에 안들어가는 현상 수정
-                distance = 100f;
-            }
+            //if (curTarget.tag == "Outpost")
+            //{
+            //    // 초기 전초기지에 안들어가는 현상 수정
+            //    distance = 100f;
+            //}
+            //if(curTarget.layer == outPostLayerMask)
+            //{
+            //    distance = 100f;
+            //}
 
             Vector3 direction = (curTarget.transform.position - transform.position).normalized;
             Vector3 newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;
             transform.LookAt(curTarget.transform);
+
+            //Debug.Log("outpostLayer : " + outPostLayerMask);
+            //Debug.Log("curTargetLayer : " + curTarget.layer);
+
+            if (curPoint != OutPostPoint.None)
+            {
+                float distancePoint = Vector3.Distance(targetOutPost.transform.position, transform.position);
+
+                if(distance > distancePoint)
+                {
+                    direction = (targetOutPost.transform.position - transform.position).normalized;
+                    newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;
+
+                    if (distancePoint < 2)
+                    {
+                        curPoint = OutPostPoint.None;
+                        targetOutPost = null;
+                    }
+
+                    transform.position = newPosition;
+                    return;                    
+                }
+            }
+
+            //if (playerDefine == PlayerDefine.Player || curTarget.layer == outPostLayerMask)
+            //{
+            //    if(distance < 3)
+            //    {
+            //        //animator.SetInteger("unitState", (int)UnitState.Idle);
+            //        ChangeCurState(UnitState.Idle);
+            //        return;
+            //    }
+
+            //    transform.position = newPosition;
+            //    return;
+            //}
 
             // 거리가 사거리보다 작다면 공격으로 전환
             if (distance < this.status.attackRange)
@@ -160,7 +220,7 @@ public class InheriteStatus : MonoBehaviour
                     ChangeCurState(UnitState.Idle);
                     return;
                 }
-                animator.SetBool("isAttackMotion", false);
+                //animator.SetBool("isAttackMotion", false);
                 ChangeCurState(UnitState.Idle);
                 return;
             }
@@ -288,6 +348,15 @@ public class InheriteStatus : MonoBehaviour
         }
     }
 
+    public void CheckComingEnemy()
+    {
+        if(this.curPoint != OutPostPoint.None)
+        {
+            //this.curPoint = OutPostPoint.None;
+            //FindNewEnemy();
+        }
+    }
+
     public void FindNewEnemy()
     {
         // 해당열 적을 우선 타겟
@@ -315,19 +384,23 @@ public class InheriteStatus : MonoBehaviour
             }
 
             //int enemyLayerMask = LayerMask.NameToLayer("Player");
-            if (unit.gameObject.layer != enemyLayerMask)
+            //if (unit.gameObject.layer != enemyLayerMask)
+            //{
+            //    continue;
+            //}
+
+            if(unit.gameObject.layer == enemyLayerMask)
             {
-                continue;
+                float distance = Vector3.Distance(transform.position, unit.position);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    newTarget = unit.gameObject;
+                }
+
+                checkUnitCount++;
             }
 
-            float distance = Vector3.Distance(transform.position, unit.position);
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                newTarget = unit.gameObject;
-            }
-
-            checkUnitCount++;
         }
 
         if (checkUnitCount == 0)
@@ -400,6 +473,55 @@ public class InheriteStatus : MonoBehaviour
         hpBarImage.fillAmount = (float)this.status.curHp / this.status.finalHp;
     }
 
+    public OutPostPoint CheckOutPostPoint(GameObject obj)
+    {
+        OutPostPoint point = OutPostPoint.None;
+
+        string name = obj.name;
+
+        switch (name)
+        {
+            case "Point_00":
+                point = OutPostPoint.Point_00;
+                break;
+            case "Point_01":
+                point = OutPostPoint.Point_01;
+                break;
+            case "Point_02":
+                point = OutPostPoint.Point_02;
+                break;
+            case "Point_03":
+                point = OutPostPoint.Point_03;
+                break;
+            case "Point_10":
+                point = OutPostPoint.Point_10;
+                break;
+            case "Point_11":
+                point = OutPostPoint.Point_11;
+                break;
+            case "Point_12":
+                point = OutPostPoint.Point_12;
+                break;
+            case "Point_13":
+                point = OutPostPoint.Point_13;
+                break;
+            case "Point_20":
+                point = OutPostPoint.Point_20;
+                break;
+            case "Point_21":
+                point = OutPostPoint.Point_21;
+                break;
+            case "Point_22":
+                point = OutPostPoint.Point_22;
+                break;
+            case "Point_23":
+                point = OutPostPoint.Point_23;
+                break;
+        }
+
+        return point;
+    }
+
     private void OnCollisionEnter(Collision unit)
     {
         GameObject checkObject = unit.gameObject;
@@ -407,6 +529,35 @@ public class InheriteStatus : MonoBehaviour
         if (checkObject.layer == enemyLayerMask && !isAttack)
         {
             this.status.curTarget = checkObject;
+        }        
+    }
+
+    private void OnCollisionExit(Collision unit)
+    {
+        
+    }
+
+    private void OnTriggerEnter(Collider unit)
+    {
+        GameObject checkObject = unit.gameObject;
+
+        if (checkObject.layer == outPostLayerMask && playerDefine == PlayerDefine.Player)
+        {
+            this.curPoint = CheckOutPostPoint(checkObject);
+            this.targetOutPost = checkObject;
         }
     }
+
+    private void OnTriggerExit(Collider unit)
+    {
+        GameObject checkObject = unit.gameObject;
+
+        if (checkObject.layer == outPostLayerMask && playerDefine == PlayerDefine.Player)
+        {
+            this.curPoint = OutPostPoint.None;
+            this.targetOutPost = null;
+        }
+    }
+
+
 }

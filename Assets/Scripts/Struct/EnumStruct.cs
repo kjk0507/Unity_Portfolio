@@ -63,4 +63,35 @@ namespace EnumStruct
         Stand,
         Move
     }
+
+    public enum OutPostType
+    {
+        InActive,
+        Active_Player,
+        Active_Enemy,
+    }
+
+    public enum OutPostState
+    {
+        InActive,
+        Wait,
+        Move
+    }
+
+    public enum OutPostPoint
+    {
+        None,
+        Point_00,
+        Point_01,
+        Point_02,
+        Point_03,
+        Point_10,
+        Point_11,
+        Point_12,
+        Point_13,
+        Point_20,
+        Point_21,
+        Point_22,
+        Point_23,
+    }
 }
