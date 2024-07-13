@@ -6052,6 +6052,9 @@ MonoBehaviour:
   curState: 0
   occupationGage: 0
   isOccupation: 0
+  warriorList: []
+  archerList: []
+  wizardList: []
   warriorCount: {fileID: 517584342}
   archerCount: {fileID: 2077164514}
   wizardCount: {fileID: 1935461518}
@@ -10005,6 +10008,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Point_00
       objectReference: {fileID: 0}
+    - target: {fileID: 1619394362785843503, guid: c00c4d2eac3d3254d8f38053e4106cfe, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2109579465078122461, guid: c00c4d2eac3d3254d8f38053e4106cfe, type: 3}
       propertyPath: m_Layer
       value: 14
@@ -10077,6 +10084,14 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 998b6750dd800e640b4d7d2a9b33ae8a, type: 2}
+    - target: {fileID: 6775466852960479998, guid: c00c4d2eac3d3254d8f38053e4106cfe, type: 3}
+      propertyPath: m_Radius
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6775466852960479998, guid: c00c4d2eac3d3254d8f38053e4106cfe, type: 3}
+      propertyPath: m_Center.x
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7287578920750163464, guid: c00c4d2eac3d3254d8f38053e4106cfe, type: 3}
       propertyPath: curType
       value: 1

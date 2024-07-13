@@ -21,7 +21,7 @@ public class InheriteStatus : MonoBehaviour
     public GameObject targetOutPost;
 
     public bool isAttack = false; // 실제 공격중
-    bool isTargetDeath = false; // 타겟의 생존 여부 false : 생존
+    //bool isTargetDeath = false; // 타겟의 생존 여부 false : 생존
     public bool isAttackMotion = false; // true : 모션 실행중 / false : 모션 실행 안하는중
 
     public int enemyLayerMask; // 적 레이어(번호)
@@ -32,6 +32,7 @@ public class InheriteStatus : MonoBehaviour
     public bool isPointMove = false; // true : 이동 가능 / false : 이동 불가능 
 
     Queue<Transform> routeQueue = new Queue<Transform>();
+
     void Start()
     {
         
@@ -61,22 +62,32 @@ public class InheriteStatus : MonoBehaviour
         this.status.curRow = row;
         this.status.curTarget = curTarget;
         this.status.finalTarget = finalTarget;
-        this.targetOutPost = point;
-        this.curPoint = CheckOutPostPoint(point);
-        SpawnManager.sm_instance.ResistRoute(routeQueue, row);
+
+        if(spawnType != SpawnType.Initial)
+        {
+            this.targetOutPost = point;
+            this.curPoint = CheckOutPostPoint(point);
+            SpawnManager.sm_instance.ResistRoute(routeQueue, row);
+        }
+
     }
 
     public void SelectAction()
     {
         // todo 대기(0), 이동(1), 공격(2), 사망(3) -> 행동 코드도 따라가야됨 : 애니메이션코드와 상태변경 코드가 같이 실행 될것!
         // 그 상태가 아니라면 실행 안함
+
+        // 고정형은 애니메이션을 보내지 않음
+        if (this.status.moveType != MoveType.Stand)
+        {
+            animator.SetInteger("unitState", (int)curState);
+            animator.SetBool("isAttackMotion", isAttackMotion);
+        }
+
         if (this.status.curHp <= 0)
         {
             ChangeCurState(UnitState.Death);
         }
-
-        //animator.SetInteger("unitState", (int)curState);
-        //animator.SetBool("isAttackMotion", isAttackMotion);
 
         switch (curState)
         {
@@ -92,192 +103,198 @@ public class InheriteStatus : MonoBehaviour
             case UnitState.Death:
                 ActionDeath();
                 break;
-        }
-
-        //ChangeCurState(curState);
+        }        
     }
 
     public void ChangeCurState(UnitState state)
     {
         curState = state;
-
-        if (this.status.moveType == MoveType.Stand)
-        {
-            return;
-        }
-
-        animator.SetInteger("unitState", (int)curState);
-        animator.SetBool("isAttackMotion", isAttackMotion);
-    }
-    public void ChangeCurTarget(GameObject curTarget)
-    {
-        this.status.curTarget = curTarget;
     }
 
     public void ActionIdle()
     {
-        Debug.Log("ActionIdle");
-        if(curState != UnitState.Idle)
+        // 들어오는 경우
+        // move : 전초기지에 도착한 경우 -> 유닛의 초기 생성시에는 이를 무시하고 전초기지까진 가야함
+        // attack : 목표를 잃은 경우
+        // 타겟이 없는 상태라면 타겟을 지정
+        //if (this.status.curTarget == null)
+        //{
+        //    FindNewEnemy();
+        //}
+
+        FindNewEnemy();
+
+        // 그래도 없다면 point를 향해 감
+        if (this.status.curTarget == null && this.curPoint != OutPostPoint.None && this.spawnType != SpawnType.Initial && isPointMove)
         {
+            // 단 도달했다면 멈춤
+            float distance = Vector3.Distance(this.targetOutPost.transform.position, transform.position);
+
+            if(distance > 2)
+            {
+                ChangeCurState(UnitState.Move);
+                return;
+            }
+            
             return;
         }
 
-        // 목표가 있다면 이동 -> 이동에서 공격
+        // 목표가 있는 경우
         if (this.status.curTarget != null)
         {
+            if((curPoint == OutPostPoint.Point_00 || curPoint == OutPostPoint.Point_10 || curPoint == OutPostPoint.Point_20
+                || curPoint == OutPostPoint.Point_03 || curPoint == OutPostPoint.Point_13 || curPoint == OutPostPoint.Point_23) && this.spawnType != SpawnType.Initial && isPointMove)
+            {
+                ChangeCurState(UnitState.Move);
+                return;
+            }
+
             GameObject curTarget = this.status.curTarget;
             float distance = Vector3.Distance(this.status.curTarget.transform.position, transform.position);
 
-            // 초기 적이라면 많이 움직이지 않기
-            if (playerDefine == PlayerDefine.Enemy && distance >= 35f && spawnType == SpawnType.IniInitial) // 35가 가장 먼 공격임
+            // 초기 생성이라면 많이 움직이지 않기
+            if (playerDefine == PlayerDefine.Enemy && distance >= 35f && spawnType == SpawnType.Initial) // 35가 가장 먼 공격임
             {
                 return;
             }
 
-            if (playerDefine == PlayerDefine.Player && curPoint != OutPostPoint.None)
+            // 거리가 멀다면 이동, 거리가 사거리보다 가깝다면 공격, 그냥 가깝다면 idle 유지
+            if(distance > this.status.attackRange)
             {
-                float distancePoint = Vector3.Distance(this.targetOutPost.transform.position, transform.position);
-
-                if (distancePoint < 3)
+                // point move가 true인 상태에선 이동 아니라면 상태 유지
+                if(isPointMove)
                 {
-                    return;
+                    ChangeCurState(UnitState.Move);
                 }
+            } else
+            {
+                isAttack = true; // 공격 중을 의미
+                isAttackMotion = true; // 모션의 종료
+                ChangeCurState(UnitState.Attack);
             }
-
-            ChangeCurState(UnitState.Move);
-            return;
-        }      
-        
-        if(this.status.curTarget == null && this.curPoint != OutPostPoint.None)
-        {
-            ChangeCurState(UnitState.Move);
-            return;
         }
-
     }
 
     public void ActionMove()
     {
-        // 타겟과 거리 측정 후 사정거리 안에 들어오는 경우에 공격으로 전환
-        // 아니라면 이동 실행
-        Debug.Log("ActionMove");
-        if (curState != UnitState.Move)
-        {
-            return;
-        }
+        // 들어오는 경우
+        // idle : 목표가 없는 경우(다음 point까지), 거리가 먼경우 타겟에게 가까워질때 까지
 
-        if (this.status.curTarget == null && this.curPoint != OutPostPoint.None)
-        {
-            Debug.Log("null");
-            float distancePoint = Vector3.Distance(targetOutPost.transform.position, transform.position);
-
-            Vector3 direction = (targetOutPost.transform.position - transform.position).normalized;
-            Vector3 newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;
-
-            if (distancePoint < 2)
-            {
-                Transform route = routeQueue.Dequeue();
-                curPoint = CheckOutPostPoint(route.gameObject);
-                targetOutPost = route.gameObject;
-
-                //curPoint = OutPostPoint.None;
-                //targetOutPost = null;
-            }
-
-            transform.position = newPosition;
-            return;
-        }
-
-        GameObject curTarget = this.status.curTarget;
-
+        // 고정형인 경우에는 바로 공격으로 전환
         if (this.status.moveType == MoveType.Stand)
         {
             ChangeCurState(UnitState.Attack);
             return;
         }
 
-        if (this.status.curTarget != null && !isAttackMotion && !isAttack)
+        if (!isPointMove)
         {
-            float distance = Vector3.Distance(curTarget.transform.position, transform.position);
+            ChangeCurState(UnitState.Idle); 
+            return;
+        }
 
-            Vector3 direction = (curTarget.transform.position - transform.position).normalized;
-            Vector3 newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;
-            transform.LookAt(curTarget.transform);
+        // 목표가 없는 경우
+        if ((this.status.curTarget == null && this.curPoint != OutPostPoint.None)
+            || (curPoint == OutPostPoint.Point_00 || curPoint == OutPostPoint.Point_10 || curPoint == OutPostPoint.Point_20) 
+            || (curPoint == OutPostPoint.Point_03 || curPoint == OutPostPoint.Point_13 || curPoint == OutPostPoint.Point_23))
+        {
+            float distancePoint = Vector3.Distance(targetOutPost.transform.position, transform.position);
+            Vector3 direction = (targetOutPost.transform.position - transform.position).normalized;
+            Vector3 newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;            
 
-            //Debug.Log("outpostLayer : " + outPostLayerMask);
-            //Debug.Log("curTargetLayer : " + curTarget.layer);
-
-            if (curPoint != OutPostPoint.None)
+            // 포인터에 접근한 경우(플레이어)
+            if (distancePoint < 2 && routeQueue.Count != 0 && playerDefine == PlayerDefine.Player)
             {
-                float distancePoint = Vector3.Distance(targetOutPost.transform.position, transform.position);
-
-                if(distance > distancePoint)
-                {
-                    direction = (targetOutPost.transform.position - transform.position).normalized;
-                    newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;
-
-                    if (distancePoint < 2)
-                    {
-                        Transform route = routeQueue.Dequeue();
-                        curPoint = CheckOutPostPoint(route.gameObject);
-                        targetOutPost = route.gameObject;
-
-                        //curPoint = OutPostPoint.None;
-                        //targetOutPost = null;
-                    }
-
-                    //transform.position = newPosition;
-                    //return;                    
-                }
+                Transform route = routeQueue.Dequeue();
+                curPoint = CheckOutPostPoint(route.gameObject);
+                targetOutPost = route.gameObject;
+                return;
             }
+
+            // 포인터에 접근한 경우(플레이어)
+            if (distancePoint < 2 && routeQueue.Count == 3 && playerDefine == PlayerDefine.Enemy)
+            {
+                Transform route = routeQueue.Dequeue();
+                curPoint = CheckOutPostPoint(route.gameObject);
+                targetOutPost = route.gameObject;
+                return;
+            }
+
+            // 포인터와 먼 경우
+            if (distancePoint > 2)
+            {
+                transform.LookAt(targetOutPost.transform);
+                transform.position = newPosition;
+                return;
+            }
+
+            // 포인터에 도달한 경우
+            ChangeCurState(UnitState.Idle);
+            return;
+        }
+
+        // 목표가 있는 경우
+        if (this.status.curTarget != null)
+        {
+            GameObject curTarget = this.status.curTarget;
+
+            float distance = Vector3.Distance(curTarget.transform.position, transform.position);
+            Vector3 direction = (curTarget.transform.position - transform.position).normalized;
+            Vector3 newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;           
 
             // 거리가 사거리보다 작다면 공격으로 전환
             if (distance < this.status.attackRange)
             {
+                isAttack = true; // 공격 중을 의미
+                isAttackMotion = true; // 모션의 종료
                 ChangeCurState(UnitState.Attack);
                 return;
             }
 
-            // isAttackMotion이 false여야 이동;
-            if(isAttackMotion)
+            // 전초기지에서 못가게 한 경우 멈춤
+            if (!isPointMove && playerDefine == PlayerDefine.Player)
             {
-                isAttackMotion = false;
-                if (this.status.moveType == MoveType.Stand)
-                {
-                    ChangeCurState(UnitState.Idle);
-                    return;
-                }
-                //animator.SetBool("isAttackMotion", false);
                 ChangeCurState(UnitState.Idle);
                 return;
             }
 
             // 거리가 사거리보다 크다면 이동
+            transform.LookAt(curTarget.transform);
             transform.position = newPosition;
             return;
+
+            //// isAttackMotion이 false여야 이동;
+            //if (isAttackMotion)
+            //{
+            //    isAttackMotion = false;
+            //    if (this.status.moveType == MoveType.Stand)
+            //    {
+            //        ChangeCurState(UnitState.Idle);
+            //        return;
+            //    }
+            //    ChangeCurState(UnitState.Idle);
+            //    return;
+            //}            
         }
     }
 
     public void ActionAttack()
     {
-        if (curState != UnitState.Attack)
-        {
-            return;
-        }
-        Debug.Log("ActionAttack");
-        // 타겟이 사망하거나 자신이 죽은 경우 바뀌어야함
-        isAttack = true;
-        isAttackMotion = true;
+        // 들어오는 경우
+        // idle : 타겟과 거리가 사거리보다 작은 경우
+        // move : 이동을 통해 거리가 사거리보다 작은 경우
 
-        // 타겟이 이동했는데 거리가 멀어졌을시
-        if (this.status.curTarget != null || this.status.curTarget.GetComponent<Collider>() == null)
-        {
-            float distance = Vector3.Distance(this.status.curTarget.transform.position, transform.position);
+        // 타겟이 사망하는 경우 idle로 전환, collider가 없는 경우에도 사망으로 처리        
 
-            if (distance > this.status.attackRange)
+        // collider 없다는 건 사망했다는 의미로 타겟을 삭제 처리
+        if (isAttack)
+        {
+            if ((this.status.curTarget == null || this.status.curTarget.GetComponent<Collider>() == null) && !isAttackMotion)
             {
-                isAttack = false;
-                //isAttackMotion = false;
+                isAttack = false; // 공격 종료
+                this.status.curTarget = null;
+                //isPointMove = true;
+
                 ChangeCurState(UnitState.Idle);
                 return;
             }
@@ -379,22 +396,6 @@ public class InheriteStatus : MonoBehaviour
     public void EndAttackMotion()
     {
         isAttackMotion = false;
-
-
-        if (this.status.curTarget != null)  // this.status.curTarget.GetComponent<InheriteStatus>().status.moveType == MoveType.Stand
-        {
-            FindNewEnemy();
-            ChangeCurState(UnitState.Idle);
-        }
-    }
-
-    public void CheckComingEnemy()
-    {
-        if(this.curPoint != OutPostPoint.None)
-        {
-            //this.curPoint = OutPostPoint.None;
-            //FindNewEnemy();
-        }
     }
 
     public void FindNewEnemy()
@@ -406,8 +407,6 @@ public class InheriteStatus : MonoBehaviour
         Transform line = null;
         line = UnitManager.um_instance.FindLine(row);
         this.status.curTarget = CheckLineEnemy(line);
-
-        ChangeCurState(UnitState.Idle);
     }
 
     public GameObject CheckLineEnemy(Transform line)
@@ -418,16 +417,11 @@ public class InheriteStatus : MonoBehaviour
 
         foreach (Transform unit in line)
         {
+            // Collider가 없다면 적이 아님
             if (unit.GetComponent<Collider>() == null)
             {
                 continue;
             }
-
-            //int enemyLayerMask = LayerMask.NameToLayer("Player");
-            //if (unit.gameObject.layer != enemyLayerMask)
-            //{
-            //    continue;
-            //}
 
             if(unit.gameObject.layer == enemyLayerMask)
             {
@@ -445,27 +439,10 @@ public class InheriteStatus : MonoBehaviour
 
         if (checkUnitCount == 0)
         {
-            // 태그를 통한 적 탐지 방법
-            //List<GameObject> FoundObjects;
-            //FoundObjects = new List<GameObject>(GameObject.FindGameObjectsWithTag("Enemy"));
-
-
-            //foreach (GameObject obj in FoundObjects)
-            //{
-            //    float distance = Vector3.Distance(transform.position, obj.transform.position);
-            //    if (distance < closestDistance)
-            //    {
-            //        closestDistance = distance;
-            //        newTarget = obj.transform.gameObject;
-            //    }
-            //}
-
             // 레이어를 통한 적 탐지 방법
             float searchRadius = 50f;
             Vector3 currentPosition = transform.position;
             Collider[] colliders = Physics.OverlapSphere(currentPosition, searchRadius, findLayerMask);
-            //Collider closestEnemy = null;
-            //float closestDistanceSqr = Mathf.Infinity;
 
             foreach (Collider obj in colliders)
             {
@@ -479,24 +456,6 @@ public class InheriteStatus : MonoBehaviour
         }
 
         return newTarget;
-    }    
-
-    public void CheckTargetDeath()
-    {
-        if (this.status.curTarget == null || this.status.curTarget.GetComponent<Collider>() == null)
-        {
-            isTargetDeath = true;
-            //animator.SetInteger("unitState", (int)UnitState.Idle);
-        }
-
-        // 타겟 사망시
-        if (isTargetDeath)
-        {
-            isTargetDeath = false;
-            isAttack = false;
-            //isAttackMotion = true; // 모션은 무조건 false에만 나오는것이 가능
-            FindNewEnemy();
-        }
     }
 
     public void DamageToEnemy()
@@ -505,7 +464,7 @@ public class InheriteStatus : MonoBehaviour
         {
             return;
         }
-        status.curTarget.GetComponent<InheriteStatus>().status.Damage(this.status.finalAtk);
+        this.status.curTarget.GetComponent<InheriteStatus>().status.Damage(this.status.finalAtk);
     }
 
     public void CheckCurHp()
@@ -516,6 +475,11 @@ public class InheriteStatus : MonoBehaviour
     public OutPostPoint CheckOutPostPoint(GameObject obj)
     {
         OutPostPoint point = OutPostPoint.None;
+
+        if(obj == null)
+        {
+            return point;
+        }
 
         string name = obj.name;
 

@@ -71,8 +71,7 @@ public class SpawnManager : MonoBehaviour
 
         InitialResistQueue();
         InitialSpawnEnemy();
-        //InitialResistRoute();
-        InvokeRepeating("AutoSpawnEnemyUnit", 0f, 1f);
+        //InvokeRepeating("AutoSpawnEnemyUnit", 0f, 1f);
     }
 
     void Update()
@@ -137,37 +136,17 @@ public class SpawnManager : MonoBehaviour
         //}
 
         // 01열
-        SpawnUnitPosition(UnitType.Orc, point_01, LineType.Top, SpawnType.IniInitial, 3);
-        SpawnUnitPosition(UnitType.BoneArcher, point_01, LineType.Top, SpawnType.IniInitial, 1);
+        SpawnUnitPosition(UnitType.Orc, point_01, LineType.Top, SpawnType.Initial, 3);
+        SpawnUnitPosition(UnitType.BoneArcher, point_01, LineType.Top, SpawnType.Initial, 1);
 
-        SpawnUnitPosition(UnitType.Orc, point_11, LineType.Middle, SpawnType.IniInitial, 3);
-        SpawnUnitPosition(UnitType.BoneArcher, point_11, LineType.Middle, SpawnType.IniInitial, 1);
+        SpawnUnitPosition(UnitType.Orc, point_11, LineType.Middle, SpawnType.Initial, 3);
+        SpawnUnitPosition(UnitType.BoneArcher, point_11, LineType.Middle, SpawnType.Initial, 1);
 
-        //SpawnUnitPosition(UnitType.Orc, point_21, LineType.Bottom, SpawnType.IniInitial, 3);
-        //SpawnUnitPosition(UnitType.BoneArcher, point_21, LineType.Bottom, SpawnType.IniInitial, 1);
+        //SpawnUnitPosition(UnitType.Orc, point_21, LineType.Bottom, SpawnType.Initial, 3);
+        //SpawnUnitPosition(UnitType.BoneArcher, point_21, LineType.Bottom, SpawnType.Initial, 1);
 
         // 스폰포인트
-        //SpawnUnitPosition(UnitType.Destroyer, spawnLocation, LineType.Middle, SpawnType.IniInitial, 1);
-    }
-    public void InitialResistRoute()
-    {
-        // 상단 루트
-        topRoute.Enqueue(point_00);
-        topRoute.Enqueue(point_01);
-        topRoute.Enqueue(point_02);
-        topRoute.Enqueue(point_03);
-
-        // 중단 루트
-        middleRoute.Enqueue(point_10);
-        middleRoute.Enqueue(point_11);
-        middleRoute.Enqueue(point_12);
-        middleRoute.Enqueue(point_13);
-
-        // 하단 루트
-        bottomRoute.Enqueue(point_20);
-        bottomRoute.Enqueue(point_21);
-        bottomRoute.Enqueue(point_22);
-        bottomRoute.Enqueue(point_23);
+        //SpawnUnitPosition(UnitType.Destroyer, spawnLocation, LineType.Middle, SpawnType.Initial, 1);
     }
 
     public void ResistRoute(Queue<Transform> route, LineType type)
@@ -359,12 +338,6 @@ public class SpawnManager : MonoBehaviour
 
     public void AutoSpawnEnemyUnit()
     {
-        //Debug.Log("topQueue : " + topLineQueue.Count);
-        if (player == PlayerDefine.Player)
-        {
-            return;
-        }
-
         // 해당 라인 유닛 수 체크, 큐에 유닛 등록해두고 유닛 수 줄어들때 마다 생성
         CheckLineUnitNum();
         SpawnUnitLine();

@@ -16,6 +16,7 @@ public class EnemyStatus : InheriteStatus
         findLayerMask = LayerMask.GetMask("Player");
         ownLayerMask = LayerMask.NameToLayer("Enemy");
 
+        isPointMove = true;
         //SelectAction();
     }
 
@@ -24,9 +25,7 @@ public class EnemyStatus : InheriteStatus
         Target = this.status.curTarget;
         CheckCurHp();
         //TestDebugRay();
-        CheckTargetDeath();
         //SelectAction();
-        //ActionMove();
     }
 
     private void FixedUpdate()

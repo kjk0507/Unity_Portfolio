@@ -2,8 +2,10 @@ using EnumStruct;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEngine.UI.CanvasScaler;
 
 public class OutpostControl : MonoBehaviour
 {
@@ -27,6 +29,10 @@ public class OutpostControl : MonoBehaviour
     public bool isOccupation = false; // 점령 중이면 true
 
     // 주둔 병사 수
+    public List<GameObject> warriorList = new List<GameObject>();
+    public List<GameObject> archerList = new List<GameObject>();
+    public List<GameObject> wizardList = new List<GameObject>();
+
     public TextMeshProUGUI warriorCount;
     public TextMeshProUGUI archerCount;
     public TextMeshProUGUI wizardCount;
@@ -40,22 +46,8 @@ public class OutpostControl : MonoBehaviour
     public GameObject Button_Grean;
     public GameObject Button_Red;
 
-    //public GameObject warriorList;
-    //public GameObject archerList;
-    //public GameObject wizardList;
-
-    // 이미지로 안하고 게임 오브젝트로 함
-    //public GameObject waitingImage;
-    //public GameObject goImage;
-
-
-    //public GameObject spawnLocation;
-
-    //public GameObject topLine;
-    //public GameObject middleLine;
-    //public GameObject bottomLine;
-
-    //public GameObject testtarget;
+    // 유닛 체크 중
+    public bool isChecked = false;
 
     void Start()
     {
@@ -64,7 +56,8 @@ public class OutpostControl : MonoBehaviour
 
     void Update()
     {
-        //CheckUnitCount();
+        CheckUnitCount();
+        CheckEnterUnitState();
     }
 
     public void Initialize()
@@ -78,9 +71,12 @@ public class OutpostControl : MonoBehaviour
     public void CheckUnitCount()
     {
         // 이거 안될꺼 같으면 걍 trigger로 처리, list 만들어서 ontrigger랑 exit 트리거로 관리
-        warriorNum = UnitManager.um_instance.CheckUnitListNum(this.gameObject, UnitType.Warrior);
-        archerNum = UnitManager.um_instance.CheckUnitListNum(this.gameObject, UnitType.Archer);
-        wizardNum = UnitManager.um_instance.CheckUnitListNum(this.gameObject, UnitType.Wizard);
+        //warriorNum = UnitManager.um_instance.CheckUnitListNum(this.gameObject, UnitType.Warrior);
+        //archerNum = UnitManager.um_instance.CheckUnitListNum(this.gameObject, UnitType.Archer);
+        //wizardNum = UnitManager.um_instance.CheckUnitListNum(this.gameObject, UnitType.Wizard);
+        warriorNum = warriorList.Count;
+        archerNum = archerList.Count;
+        wizardNum = wizardList.Count;
 
         warriorCount.text = warriorNum.ToString();
         archerCount.text = archerNum.ToString();
@@ -120,7 +116,6 @@ public class OutpostControl : MonoBehaviour
     public void ChangeOutPostState(OutPostState state)
     {
         // 돌 버튼 색상 변화
-        //curState = (OutPostState)System.Enum.ToObject(typeof(OutPostState), state); ;
         curState = state;
 
         switch (curState)
@@ -134,79 +129,74 @@ public class OutpostControl : MonoBehaviour
                 Button_Black.SetActive(false);
                 Button_Grean.SetActive(true);
                 Button_Red.SetActive(false);
+
+                foreach(GameObject unit in warriorList)
+                {
+                    unit.GetComponent<InheriteStatus>().isPointMove = true;
+                }
+                foreach (GameObject unit in archerList)
+                {
+                    unit.GetComponent<InheriteStatus>().isPointMove = true;
+                }
+                foreach (GameObject unit in wizardList)
+                {
+                    unit.GetComponent<InheriteStatus>().isPointMove = true;
+                }
+
                 break;
             case OutPostState.Wait:
                 Button_Black.SetActive(false);
                 Button_Grean.SetActive(false);
                 Button_Red.SetActive(true);
+
+                foreach (GameObject unit in warriorList)
+                {
+                    unit.GetComponent<InheriteStatus>().isPointMove = false;
+                }
+                foreach (GameObject unit in archerList)
+                {
+                    unit.GetComponent<InheriteStatus>().isPointMove = false;
+                }
+                foreach (GameObject unit in wizardList)
+                {
+                    unit.GetComponent<InheriteStatus>().isPointMove = false;
+                }
+
                 break;
         }
     }
 
+    public void CheckEnterUnitState()
+    {
+        if (!isChecked)
+        {
+            foreach (GameObject unit in warriorList)
+            {
+                ChangePointMove(unit);
+            }
 
-    //public void CheckUnitCount()
-    //{
-    //    warriorNum = warriorList.transform.childCount;
-    //    archerNum = archerList.transform.childCount;
-    //    wizardNum = wizardList.transform.childCount;
+            foreach (GameObject unit in archerList)
+            {
+                ChangePointMove(unit);
+            }
 
-    //    warriorCount.text = warriorNum.ToString();
-    //    archerCount.text = archerNum.ToString();
-    //    wizardCount.text = wizardNum.ToString();
-    //}
-
-    //public void ChangeUnitTarget()
-    //{
-    //    List<Transform> units = new List<Transform>();
-    //    foreach (Transform unit in warriorList.transform)
-    //    {
-    //        units.Add(unit);
-    //    }
-
-    //    foreach (Transform unit in archerList.transform)
-    //    {
-    //        units.Add(unit);
-    //    }
-
-    //    foreach (Transform unit in wizardList.transform)
-    //    {
-    //        units.Add(unit);
-    //    }
-
-    //    foreach (Transform unit in units)
-    //    {
-    //        Vector3 randomRange = new Vector3(2.0f, 2.0f, 2.0f);
-
-    //        Vector3 randomOffset = new Vector3(
-    //            Random.Range(-randomRange.x, randomRange.x),
-    //            0,
-    //            Random.Range(-randomRange.z, randomRange.z)
-    //        );
-
-    //        Vector3 finalPosition = spawnLocation.transform.position + randomOffset;
-
-    //        unit.gameObject.transform.position = finalPosition;
-    //        // 원래는 타겟을 강제로 바꾸는 코드였으나 unitstatus에서 실행
-    //        unit.gameObject.GetComponent<UnitStatus>().ChangeCurTarget(null);
-
-    //        LineType row = unit.gameObject.GetComponent<UnitStatus>().status.curRow;
-
-    //        switch (row)
-    //        {
-    //            case LineType.Top:
-    //                unit.transform.SetParent(topLine.transform);
-    //                break;
-    //            case LineType.Middle:
-    //                unit.transform.SetParent(middleLine.transform);
-    //                break;
-    //            case LineType.Bottom:
-    //                unit.transform.SetParent(bottomLine.transform);
-    //                break;
-    //        }
-
-    //        unit.gameObject.SetActive(true);
-    //    }
-    //}
+            foreach (GameObject unit in wizardList)
+            {
+                ChangePointMove(unit);
+            }
+        }        
+    }
+    public void ChangePointMove(GameObject unit)
+    {
+        if (curState == OutPostState.Move)
+        {
+            unit.GetComponent<InheriteStatus>().isPointMove = true;
+        }
+        else
+        {
+            unit.GetComponent<InheriteStatus>().isPointMove = false;
+        }
+    }
 
     //public void CheckOutpostState()
     //{
@@ -230,29 +220,47 @@ public class OutpostControl : MonoBehaviour
 
     private void OnTriggerEnter(Collider unit)
     {
-        //GameObject checkObject = unit.gameObject;
-        //string tag = unit.tag;
+        UnitType type;
 
-        //switch (tag)
-        //{
-        //    case "Warrior":
-        //        unit.transform.SetParent(warriorList.transform);
-        //        break;
-        //    case "Archer":
-        //        unit.transform.SetParent(archerList.transform);
-        //        break;
-        //    case "Wizard":
-        //        unit.transform.SetParent(wizardList.transform);
-        //        break;
-        //    default:
-        //        return;
-        //}
+        if (unit.GetComponent<InheriteStatus>() != null)
+        {
+            type = unit.GetComponent<InheriteStatus>().unitType;
 
-        //checkObject.SetActive(false);
+            switch (type)
+            {
+                case UnitType.Warrior:
+                    warriorList.Add(unit.gameObject);
+                    break;
+                case UnitType.Archer:
+                    archerList.Add(unit.gameObject);
+                    break;
+                case UnitType.Wizard:
+                    wizardList.Add(unit.gameObject);
+                    break;
+            }            
+        }        
+    }
 
-        //if(!isWaiting )
-        //{
-        //    ChangeUnitTarget();
-        //}
+    private void OnTriggerExit(Collider unit)
+    {
+        UnitType type;
+
+        if (unit.GetComponent<InheriteStatus>() != null)
+        {
+            type = unit.GetComponent<InheriteStatus>().unitType;
+
+            switch (type)
+            {
+                case UnitType.Warrior:
+                    warriorList.Remove(unit.gameObject);
+                    break;
+                case UnitType.Archer:
+                    archerList.Remove(unit.gameObject);
+                    break;
+                case UnitType.Wizard:
+                    wizardList.Remove(unit.gameObject);
+                    break;
+            }
+        }
     }
 }

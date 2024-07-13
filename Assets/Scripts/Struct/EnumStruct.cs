@@ -54,7 +54,7 @@ namespace EnumStruct
 
     public enum SpawnType // 초기 생성, 추가 생성
     {
-        IniInitial,
+        Initial,
         Spawn
     }
 

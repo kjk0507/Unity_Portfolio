@@ -12,6 +12,8 @@ public class UnitStatus : InheriteStatus
         findLayerMask = LayerMask.GetMask("Enemy");
         ownLayerMask = LayerMask.NameToLayer("Player");
 
+        isPointMove = true;
+
         //SelectAction();
     }
 
@@ -20,10 +22,8 @@ public class UnitStatus : InheriteStatus
         Target = this.status.curTarget;
         CheckCurHp();
         //TestDebugRay();
-        CheckTargetDeath();
         //SelectAction();
         //CheckComingEnemy();
-        //ActionMove();
     }
 
     private void FixedUpdate()
