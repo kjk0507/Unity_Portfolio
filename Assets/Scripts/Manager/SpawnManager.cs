@@ -5,13 +5,16 @@ using EnumStruct;
 
 public class SpawnManager : MonoBehaviour
 {
+    public static SpawnManager sm_instance;
     public PlayerDefine player;
-    public Transform spawnLocation;
+    public Transform spawnLocationPlayer;
+    public Transform spawnLocationEnemy;
     public GameObject outpostTarget;
 
     [SerializeField] private GameObject curOutpost;
 
-    public GameObject finalTarget;
+    public GameObject finalTargetPlayer;
+    public GameObject finalTargetEnemy;
     //public bool spawntest = false;
 
     //public bool isEnemy = false; // true : 플레이어 스폰매니저, false : 적 스폰매니저
@@ -50,10 +53,25 @@ public class SpawnManager : MonoBehaviour
     // 프리팹 위치
     //public string prefabPath; 
 
+    // 아군 경로 큐
+    Queue<Transform> topRoute = new Queue<Transform>();
+    Queue<Transform> middleRoute = new Queue<Transform>();
+    Queue<Transform> bottomRoute = new Queue<Transform>();
+
     void Start()
     {
+        if (sm_instance == null)
+        {
+            sm_instance = this;
+        }
+        else if (sm_instance != this)
+        {
+            Destroy(gameObject);
+        }
+
         InitialResistQueue();
         InitialSpawnEnemy();
+        //InitialResistRoute();
         InvokeRepeating("AutoSpawnEnemyUnit", 0f, 1f);
     }
 
@@ -64,10 +82,10 @@ public class SpawnManager : MonoBehaviour
 
     public void InitialResistQueue()
     {
-        if (player == PlayerDefine.Player)
-        {
-            return;
-        }
+        //if (player == PlayerDefine.Player)
+        //{
+        //    return;
+        //}
 
         // 윗 라인
         ResistUnitQueue(UnitType.Orc, LineType.Top, 3);
@@ -113,23 +131,69 @@ public class SpawnManager : MonoBehaviour
     public void InitialSpawnEnemy()
     {
         // 적인 경우에만 실행
-        if (player == PlayerDefine.Player)
-        {
-            return;
-        }
+        //if (player == PlayerDefine.Player)
+        //{
+        //    return;
+        //}
 
         // 01열
         SpawnUnitPosition(UnitType.Orc, point_01, LineType.Top, SpawnType.IniInitial, 3);
         SpawnUnitPosition(UnitType.BoneArcher, point_01, LineType.Top, SpawnType.IniInitial, 1);
 
-        //SpawnUnitPosition(UnitType.Orc, point_11, LineType.Middle, SpawnType.IniInitial, 3);
-        //SpawnUnitPosition(UnitType.BoneArcher, point_11, LineType.Middle, SpawnType.IniInitial, 1);
+        SpawnUnitPosition(UnitType.Orc, point_11, LineType.Middle, SpawnType.IniInitial, 3);
+        SpawnUnitPosition(UnitType.BoneArcher, point_11, LineType.Middle, SpawnType.IniInitial, 1);
 
         //SpawnUnitPosition(UnitType.Orc, point_21, LineType.Bottom, SpawnType.IniInitial, 3);
         //SpawnUnitPosition(UnitType.BoneArcher, point_21, LineType.Bottom, SpawnType.IniInitial, 1);
 
         // 스폰포인트
         //SpawnUnitPosition(UnitType.Destroyer, spawnLocation, LineType.Middle, SpawnType.IniInitial, 1);
+    }
+    public void InitialResistRoute()
+    {
+        // 상단 루트
+        topRoute.Enqueue(point_00);
+        topRoute.Enqueue(point_01);
+        topRoute.Enqueue(point_02);
+        topRoute.Enqueue(point_03);
+
+        // 중단 루트
+        middleRoute.Enqueue(point_10);
+        middleRoute.Enqueue(point_11);
+        middleRoute.Enqueue(point_12);
+        middleRoute.Enqueue(point_13);
+
+        // 하단 루트
+        bottomRoute.Enqueue(point_20);
+        bottomRoute.Enqueue(point_21);
+        bottomRoute.Enqueue(point_22);
+        bottomRoute.Enqueue(point_23);
+    }
+
+    public void ResistRoute(Queue<Transform> route, LineType type)
+    {
+        switch (type)
+        {
+            case LineType.Top:
+                //route.Enqueue(point_00);
+                route.Enqueue(point_01);
+                route.Enqueue(point_02);
+                route.Enqueue(point_03);
+                break;
+            case LineType.Middle:
+                //route.Enqueue(point_10);
+                route.Enqueue(point_11);
+                route.Enqueue(point_12);
+                route.Enqueue(point_13);
+                break;
+            case LineType.Bottom:
+                //route.Enqueue(point_20);
+                route.Enqueue(point_21);
+                route.Enqueue(point_22);
+                route.Enqueue(point_23);
+                break;
+
+        }
     }
 
     public void SpawnUnitPosition(UnitType type, Transform spawnPosition, LineType line, SpawnType spawnType, int count)
@@ -199,7 +263,7 @@ public class SpawnManager : MonoBehaviour
                 unit.transform.rotation = Quaternion.Euler(0, 0, 0);
             }
 
-            unit.GetComponent<EnemyStatus>().Initialize(type, line, spawnType, null, outPostPoint, finalTarget);
+            unit.GetComponent<EnemyStatus>().Initialize(type, line, spawnType, null, outPostPoint, finalTargetEnemy);
             unit.transform.SetParent(parentLine.transform);
         }
     }
@@ -272,9 +336,9 @@ public class SpawnManager : MonoBehaviour
 
 
         GameObject prefab = Resources.Load<GameObject>(prefabPath);
-        GameObject instance = Instantiate(prefab, spawnLocation);
+        GameObject instance = Instantiate(prefab, spawnLocationPlayer);
         //instance.GetComponent<UnitStatus>().SetUnitType(UnitType.Warrior);
-        instance.GetComponent<UnitStatus>().Initialize(type, line, SpawnType.Spawn, null, outpostTarget, finalTarget);
+        instance.GetComponent<UnitStatus>().Initialize(type, line, SpawnType.Spawn, null, outpostTarget, finalTargetPlayer);
 
         switch (line)
         {
@@ -318,20 +382,20 @@ public class SpawnManager : MonoBehaviour
         if (topLineUnitNum < 10 && topLineQueue.Count > 0)
         {
             UnitType type = topLineQueue.Dequeue();
-            SpawnUnitPosition(type, spawnLocation, LineType.Top, SpawnType.Spawn, 1);
+            SpawnUnitPosition(type, spawnLocationEnemy, LineType.Top, SpawnType.Spawn, 1);
 
         }
 
         if (middleLineUnitNum < 10 && middleLineQueue.Count > 0)
         {
             UnitType type = middleLineQueue.Dequeue();
-            SpawnUnitPosition(type, spawnLocation, LineType.Middle, SpawnType.Spawn, 1);
+            SpawnUnitPosition(type, spawnLocationEnemy, LineType.Middle, SpawnType.Spawn, 1);
         }
 
         if (bottomLineUnitNum < 10 && bottomLineQueue.Count > 0)
         {
             UnitType type = bottomLineQueue.Dequeue();
-            SpawnUnitPosition(type, spawnLocation, LineType.Bottom, SpawnType.Spawn, 1);
+            SpawnUnitPosition(type, spawnLocationEnemy, LineType.Bottom, SpawnType.Spawn, 1);
         }
     }
 }

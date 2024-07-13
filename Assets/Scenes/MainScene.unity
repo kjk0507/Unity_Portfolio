@@ -751,7 +751,6 @@ Transform:
   m_Children:
   - {fileID: 1343929957}
   - {fileID: 1341621888}
-  - {fileID: 2012606294}
   - {fileID: 1668237875}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5888,7 +5887,7 @@ GameObject:
   - component: {fileID: 1341621888}
   - component: {fileID: 1341621889}
   m_Layer: 0
-  m_Name: SpawnManager(Player)
+  m_Name: SpawnManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5922,22 +5921,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: 0
-  spawnLocation: {fileID: 21234598}
+  spawnLocationPlayer: {fileID: 21234598}
+  spawnLocationEnemy: {fileID: 47625196}
   outpostTarget: {fileID: 0}
   curOutpost: {fileID: 0}
-  finalTarget: {fileID: 190624254}
+  finalTargetPlayer: {fileID: 821399798}
+  finalTargetEnemy: {fileID: 190624254}
   point_00: {fileID: 4177857961646731944}
   point_10: {fileID: 1169965155}
   point_20: {fileID: 407475542}
-  point_01: {fileID: 0}
-  point_02: {fileID: 0}
-  point_03: {fileID: 0}
-  point_11: {fileID: 0}
-  point_12: {fileID: 0}
-  point_13: {fileID: 0}
-  point_21: {fileID: 0}
-  point_22: {fileID: 0}
-  point_23: {fileID: 0}
+  point_01: {fileID: 1022239322}
+  point_02: {fileID: 1594260923}
+  point_03: {fileID: 1611205346}
+  point_11: {fileID: 1234548217}
+  point_12: {fileID: 862405616}
+  point_13: {fileID: 1940626336}
+  point_21: {fileID: 1004465111}
+  point_22: {fileID: 75080713}
+  point_23: {fileID: 1631789831}
   topLine: {fileID: 1785116344}
   middleLine: {fileID: 1620373531}
   bottomLine: {fileID: 930515558}
@@ -9069,73 +9070,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1975703719}
   m_CullTransparentMesh: 1
---- !u!1 &2012606293
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2012606294}
-  - component: {fileID: 2012606295}
-  m_Layer: 0
-  m_Name: SpawnManager(Enemy)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2012606294
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2012606293}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 189493428}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2012606295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2012606293}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: de8abd9637dd1524b9cde5a7e814b561, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  player: 1
-  spawnLocation: {fileID: 47625196}
-  outpostTarget: {fileID: 0}
-  curOutpost: {fileID: 0}
-  finalTarget: {fileID: 821399798}
-  point_00: {fileID: 0}
-  point_10: {fileID: 0}
-  point_20: {fileID: 0}
-  point_01: {fileID: 1022239322}
-  point_02: {fileID: 1594260923}
-  point_03: {fileID: 1611205346}
-  point_11: {fileID: 1234548217}
-  point_12: {fileID: 862405616}
-  point_13: {fileID: 1940626336}
-  point_21: {fileID: 1004465111}
-  point_22: {fileID: 75080713}
-  point_23: {fileID: 1631789831}
-  topLine: {fileID: 1785116344}
-  middleLine: {fileID: 1620373531}
-  bottomLine: {fileID: 930515558}
-  topLineUnitNum: 0
-  middleLineUnitNum: 0
-  bottomLineUnitNum: 0
 --- !u!1001 &2016345223
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10149,7 +10083,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7287578920750163464, guid: c00c4d2eac3d3254d8f38053e4106cfe, type: 3}
       propertyPath: curState
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7287578920750163464, guid: c00c4d2eac3d3254d8f38053e4106cfe, type: 3}
       propertyPath: Button_Red

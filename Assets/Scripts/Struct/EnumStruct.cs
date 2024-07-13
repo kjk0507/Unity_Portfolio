@@ -46,39 +46,39 @@ namespace EnumStruct
         Bottom,
     }
 
-    public enum DamageType
+    public enum DamageType // 단일, 다수
     {
         Target,
         AOE,
     }
 
-    public enum SpawnType
+    public enum SpawnType // 초기 생성, 추가 생성
     {
         IniInitial,
         Spawn
     }
 
-    public enum MoveType
+    public enum MoveType // 몬스터 움직임 타입
     {
         Stand,
         Move
     }
 
-    public enum OutPostType
+    public enum OutPostType // 전초기지 점령 타입
     {
         InActive,
         Active_Player,
         Active_Enemy,
     }
 
-    public enum OutPostState
+    public enum OutPostState // 전초기지 버튼
     {
         InActive,
         Wait,
         Move
     }
 
-    public enum OutPostPoint
+    public enum OutPostPoint // 전초기지 번호
     {
         None,
         Point_00,

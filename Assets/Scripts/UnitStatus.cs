@@ -11,6 +11,8 @@ public class UnitStatus : InheriteStatus
         enemyLayerMask = LayerMask.NameToLayer("Enemy");
         findLayerMask = LayerMask.GetMask("Enemy");
         ownLayerMask = LayerMask.NameToLayer("Player");
+
+        //SelectAction();
     }
 
     private void Update()
@@ -21,6 +23,7 @@ public class UnitStatus : InheriteStatus
         CheckTargetDeath();
         //SelectAction();
         //CheckComingEnemy();
+        //ActionMove();
     }
 
     private void FixedUpdate()

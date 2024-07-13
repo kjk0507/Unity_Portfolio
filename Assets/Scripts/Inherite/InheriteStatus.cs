@@ -3,6 +3,7 @@ using UnityEngine;
 using UnitStatusStruct;
 using UnityEngine.UI;
 using Unity.VisualScripting;
+using System.Collections.Generic;
 
 public class InheriteStatus : MonoBehaviour
 {
@@ -30,6 +31,7 @@ public class InheriteStatus : MonoBehaviour
 
     public bool isPointMove = false; // true : 이동 가능 / false : 이동 불가능 
 
+    Queue<Transform> routeQueue = new Queue<Transform>();
     void Start()
     {
         
@@ -61,11 +63,13 @@ public class InheriteStatus : MonoBehaviour
         this.status.finalTarget = finalTarget;
         this.targetOutPost = point;
         this.curPoint = CheckOutPostPoint(point);
+        SpawnManager.sm_instance.ResistRoute(routeQueue, row);
     }
 
     public void SelectAction()
     {
         // todo 대기(0), 이동(1), 공격(2), 사망(3) -> 행동 코드도 따라가야됨 : 애니메이션코드와 상태변경 코드가 같이 실행 될것!
+        // 그 상태가 아니라면 실행 안함
         if (this.status.curHp <= 0)
         {
             ChangeCurState(UnitState.Death);
@@ -89,6 +93,8 @@ public class InheriteStatus : MonoBehaviour
                 ActionDeath();
                 break;
         }
+
+        //ChangeCurState(curState);
     }
 
     public void ChangeCurState(UnitState state)
@@ -110,6 +116,12 @@ public class InheriteStatus : MonoBehaviour
 
     public void ActionIdle()
     {
+        Debug.Log("ActionIdle");
+        if(curState != UnitState.Idle)
+        {
+            return;
+        }
+
         // 목표가 있다면 이동 -> 이동에서 공격
         if (this.status.curTarget != null)
         {
@@ -134,13 +146,48 @@ public class InheriteStatus : MonoBehaviour
 
             ChangeCurState(UnitState.Move);
             return;
-        }        
+        }      
+        
+        if(this.status.curTarget == null && this.curPoint != OutPostPoint.None)
+        {
+            ChangeCurState(UnitState.Move);
+            return;
+        }
+
     }
 
     public void ActionMove()
     {
         // 타겟과 거리 측정 후 사정거리 안에 들어오는 경우에 공격으로 전환
         // 아니라면 이동 실행
+        Debug.Log("ActionMove");
+        if (curState != UnitState.Move)
+        {
+            return;
+        }
+
+        if (this.status.curTarget == null && this.curPoint != OutPostPoint.None)
+        {
+            Debug.Log("null");
+            float distancePoint = Vector3.Distance(targetOutPost.transform.position, transform.position);
+
+            Vector3 direction = (targetOutPost.transform.position - transform.position).normalized;
+            Vector3 newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;
+
+            if (distancePoint < 2)
+            {
+                Transform route = routeQueue.Dequeue();
+                curPoint = CheckOutPostPoint(route.gameObject);
+                targetOutPost = route.gameObject;
+
+                //curPoint = OutPostPoint.None;
+                //targetOutPost = null;
+            }
+
+            transform.position = newPosition;
+            return;
+        }
+
         GameObject curTarget = this.status.curTarget;
 
         if (this.status.moveType == MoveType.Stand)
@@ -149,20 +196,9 @@ public class InheriteStatus : MonoBehaviour
             return;
         }
 
-
-        if (this.status.curTarget != null)
+        if (this.status.curTarget != null && !isAttackMotion && !isAttack)
         {
             float distance = Vector3.Distance(curTarget.transform.position, transform.position);
-
-            //if (curTarget.tag == "Outpost")
-            //{
-            //    // 초기 전초기지에 안들어가는 현상 수정
-            //    distance = 100f;
-            //}
-            //if(curTarget.layer == outPostLayerMask)
-            //{
-            //    distance = 100f;
-            //}
 
             Vector3 direction = (curTarget.transform.position - transform.position).normalized;
             Vector3 newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;
@@ -182,27 +218,18 @@ public class InheriteStatus : MonoBehaviour
 
                     if (distancePoint < 2)
                     {
-                        curPoint = OutPostPoint.None;
-                        targetOutPost = null;
+                        Transform route = routeQueue.Dequeue();
+                        curPoint = CheckOutPostPoint(route.gameObject);
+                        targetOutPost = route.gameObject;
+
+                        //curPoint = OutPostPoint.None;
+                        //targetOutPost = null;
                     }
 
-                    transform.position = newPosition;
-                    return;                    
+                    //transform.position = newPosition;
+                    //return;                    
                 }
             }
-
-            //if (playerDefine == PlayerDefine.Player || curTarget.layer == outPostLayerMask)
-            //{
-            //    if(distance < 3)
-            //    {
-            //        //animator.SetInteger("unitState", (int)UnitState.Idle);
-            //        ChangeCurState(UnitState.Idle);
-            //        return;
-            //    }
-
-            //    transform.position = newPosition;
-            //    return;
-            //}
 
             // 거리가 사거리보다 작다면 공격으로 전환
             if (distance < this.status.attackRange)
@@ -233,6 +260,11 @@ public class InheriteStatus : MonoBehaviour
 
     public void ActionAttack()
     {
+        if (curState != UnitState.Attack)
+        {
+            return;
+        }
+        Debug.Log("ActionAttack");
         // 타겟이 사망하거나 자신이 죽은 경우 바뀌어야함
         isAttack = true;
         isAttackMotion = true;
@@ -244,6 +276,8 @@ public class InheriteStatus : MonoBehaviour
 
             if (distance > this.status.attackRange)
             {
+                isAttack = false;
+                //isAttackMotion = false;
                 ChangeCurState(UnitState.Idle);
                 return;
             }
@@ -252,7 +286,12 @@ public class InheriteStatus : MonoBehaviour
 
     public void ActionDeath()
     {
-        if(this.status.moveType == MoveType.Stand)
+        if (curState != UnitState.Death)
+        {
+            return;
+        }
+
+        if (this.status.moveType == MoveType.Stand)
         {
             Destroy(gameObject);
             return;
@@ -342,9 +381,10 @@ public class InheriteStatus : MonoBehaviour
         isAttackMotion = false;
 
 
-        if (this.status.curTarget != null && this.status.curTarget.GetComponent<InheriteStatus>().status.moveType == MoveType.Stand)
+        if (this.status.curTarget != null)  // this.status.curTarget.GetComponent<InheriteStatus>().status.moveType == MoveType.Stand
         {
             FindNewEnemy();
+            ChangeCurState(UnitState.Idle);
         }
     }
 
@@ -539,25 +579,23 @@ public class InheriteStatus : MonoBehaviour
 
     private void OnTriggerEnter(Collider unit)
     {
-        GameObject checkObject = unit.gameObject;
+        //GameObject checkObject = unit.gameObject;
 
-        if (checkObject.layer == outPostLayerMask && playerDefine == PlayerDefine.Player)
-        {
-            this.curPoint = CheckOutPostPoint(checkObject);
-            this.targetOutPost = checkObject;
-        }
+        //if (checkObject.layer == outPostLayerMask && playerDefine == PlayerDefine.Player)
+        //{
+        //    this.curPoint = CheckOutPostPoint(checkObject);
+        //    this.targetOutPost = checkObject;
+        //}
     }
 
     private void OnTriggerExit(Collider unit)
     {
-        GameObject checkObject = unit.gameObject;
+        //GameObject checkObject = unit.gameObject;
 
-        if (checkObject.layer == outPostLayerMask && playerDefine == PlayerDefine.Player)
-        {
-            this.curPoint = OutPostPoint.None;
-            this.targetOutPost = null;
-        }
+        //if (checkObject.layer == outPostLayerMask && playerDefine == PlayerDefine.Player)
+        //{
+        //    this.curPoint = OutPostPoint.None;
+        //    this.targetOutPost = null;
+        //}
     }
-
-
 }

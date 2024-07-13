@@ -59,12 +59,20 @@ public class OutpostControl : MonoBehaviour
 
     void Start()
     {
-
+        Initialize();
     }
 
     void Update()
     {
         //CheckUnitCount();
+    }
+
+    public void Initialize()
+    {
+        OutPostType type = this.curType;
+        //OutPostState state = this.curState;
+
+        ChangeOutPostType(type);
     }
 
     public void CheckUnitCount()
@@ -92,16 +100,19 @@ public class OutpostControl : MonoBehaviour
                 Body_Black.SetActive(true);
                 Body_Blue.SetActive(false);
                 Body_Red.SetActive(false);
+                ChangeOutPostState(OutPostState.InActive);
                 break;
             case OutPostType.Active_Player:
                 Body_Black.SetActive(false);
                 Body_Blue.SetActive(true);
                 Body_Red.SetActive(false);
+                ChangeOutPostState(OutPostState.Wait);
                 break;
             case OutPostType.Active_Enemy:
                 Body_Black.SetActive(false);
                 Body_Blue.SetActive(false);
                 Body_Red.SetActive(true);
+                ChangeOutPostState(OutPostState.InActive);
                 break;
         }        
     }
