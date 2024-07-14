@@ -94,4 +94,12 @@ namespace EnumStruct
         Point_22,
         Point_23,
     }
+
+    public enum StatusEffect // 이펙트
+    {
+        Charging,
+        AreaHeal,
+        Heal,
+        ElectricShock
+    }
 }

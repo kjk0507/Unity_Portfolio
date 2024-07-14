@@ -2,9 +2,8 @@ using EnumStruct;
 using UnityEngine;
 using UnitStatusStruct;
 using UnityEngine.UI;
-using Unity.VisualScripting;
 using System.Collections.Generic;
-using static UnityEditor.Rendering.CameraUI;
+using System.Collections;
 
 public class InheriteStatus : MonoBehaviour
 {
@@ -31,6 +30,11 @@ public class InheriteStatus : MonoBehaviour
     public int outPostLayerMask;
 
     public bool isPointMove = false; // true : 이동 가능 / false : 이동 불가능 
+
+    public bool isDead = false;
+
+    public Coroutine curEffectCoroutine;
+    public GameObject curEffect;
 
     Queue<Transform> routeQueue = new Queue<Transform>();
 
@@ -87,6 +91,7 @@ public class InheriteStatus : MonoBehaviour
 
         if (this.status.curHp <= 0)
         {
+            isDead = true;
             ChangeCurState(UnitState.Death);
         }
 
@@ -470,6 +475,12 @@ public class InheriteStatus : MonoBehaviour
 
     public void CheckCurHp()
     {
+        if(isDead)
+        {
+            hpBarImage.fillAmount = 0;
+            return;
+        }
+
         hpBarImage.fillAmount = (float)this.status.curHp / this.status.finalHp;
     }
 
@@ -537,6 +548,50 @@ public class InheriteStatus : MonoBehaviour
     {
         this.status.isInOutPost = false;
         this.status.curOutPost = null;
+    }
+
+    public void ApplyStatusEffect(StatusEffect name, int time, int hp)
+    {
+        if (curEffectCoroutine != null)
+        {
+            StopCoroutine(curEffectCoroutine);
+            Destroy(curEffect);
+        }
+
+        string prefabPath = "";
+        GameObject prefab;
+
+        switch (name)
+        {
+            case StatusEffect.AreaHeal:
+                prefabPath = "Prefabs/Effect/AreaHeal";
+                break;
+            case StatusEffect.Heal:
+                prefabPath = "Prefabs/Effect/Heal";
+                break;
+            case StatusEffect.ElectricShock:
+                prefabPath = "Prefabs/Effect/ElectricShock";
+                break;
+            default:
+                break;
+        }
+        
+        prefab = Resources.Load<GameObject>(prefabPath);
+
+        curEffect = Instantiate(prefab, transform);
+        curEffectCoroutine = StartCoroutine(ApplyEffect(curEffect, time, hp));
+        
+    }
+
+    IEnumerator ApplyEffect(GameObject effect, int time, int hp)
+    {
+        for(int i = 0; i < time; i++)
+        {
+            yield return new WaitForSeconds(1);
+            this.status.curHp += hp;
+        }
+
+        Destroy(effect);
     }
 
     private void OnCollisionEnter(Collision unit)

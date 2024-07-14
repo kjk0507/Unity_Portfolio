@@ -40,14 +40,14 @@ public class UnitStatus : InheriteStatus
         Vector3 direction;
         Quaternion rotation;
 
+        transform.LookAt(this.status.curTarget.transform);
+
         switch (unitType)
         {
             case UnitType.Warrior:
                 DamageToEnemy();
                 break;
             case UnitType.Archer:
-                transform.LookAt(this.status.curTarget.transform);
-
                 prefabPath = "Prefabs/Skill/Arrow";
                 prefab = Resources.Load<GameObject>(prefabPath);
 
@@ -60,8 +60,6 @@ public class UnitStatus : InheriteStatus
                 arrow.GetComponent<ProjectileControl>().Initialize(this.status.curTarget, DamageType.Target, PlayerDefine.Player, this.status.attackSpeed, this.status.finalAtk);
                 break;
             case UnitType.Wizard:
-                transform.LookAt(this.status.curTarget.transform);
-
                 prefabPath = "Prefabs/Skill/Fireball";
                 prefab = Resources.Load<GameObject>(prefabPath);
 

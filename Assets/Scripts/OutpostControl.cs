@@ -24,7 +24,7 @@ public class OutpostControl : MonoBehaviour
     public Status status;
     public OutPostType curType; // 점령 중인지 아닌지 
     public OutPostState curState; // 대기 공격 상태
-    public int occupationGage;
+    public int occupationGage = 0;
     public bool isOccupation = false; // 점령 중이면 true
     public GameObject barrier;
     public Image hpBar;
@@ -55,6 +55,10 @@ public class OutpostControl : MonoBehaviour
 
     // 유닛 체크 중
     public bool isChecked = false;
+
+    public float searchRadius = 18f; // 검사 반경
+    public float lastExecutionTime = 0f;
+    public float executionInterval = 2f; // 2초마다 검사
 
     public bool isBroke = false;
 
@@ -209,6 +213,10 @@ public class OutpostControl : MonoBehaviour
                 isOccupation = false;
                 return;
             }
+        }
+        else if(curType == OutPostType.Active_Enemy)
+        {
+            gageBarImage.fillAmount = 0;
         }
     }
 
@@ -379,7 +387,7 @@ public class OutpostControl : MonoBehaviour
 
         if (unit.GetComponent<InheriteStatus>() != null)
         {
-            type = unit.GetComponent<InheriteStatus>().unitType;
+            type = unit.GetComponent<InheriteStatus>().unitType;            
 
             switch (type)
             {
@@ -396,6 +404,43 @@ public class OutpostControl : MonoBehaviour
 
             unit.GetComponent<InheriteStatus>().RegistOutPost(gameObject);
         }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (Time.time - lastExecutionTime >= executionInterval)
+        {
+            lastExecutionTime = Time.time;
+
+            Collider[] positiveCollider;
+            Collider[] negativeCollider;
+            int playerLayerMask = LayerMask.GetMask("Player");
+            int enemyLayerMask = LayerMask.GetMask("Enemy");
+
+            if (curType == OutPostType.Active_Player)
+            {
+                positiveCollider = Physics.OverlapSphere(transform.position, searchRadius, playerLayerMask);
+                foreach(Collider unit in positiveCollider)
+                {
+                    unit.GetComponent<InheriteStatus>().ApplyStatusEffect(StatusEffect.Heal, 10, 10);
+                }
+
+                negativeCollider = Physics.OverlapSphere(transform.position, searchRadius, enemyLayerMask);
+                foreach (Collider unit in negativeCollider)
+                {
+                    unit.GetComponent<InheriteStatus>().ApplyStatusEffect(StatusEffect.ElectricShock, 10, -10);
+                }
+            }
+            else if(curType == OutPostType.Active_Enemy) 
+            {
+                positiveCollider = Physics.OverlapSphere(transform.position, searchRadius, enemyLayerMask);
+                foreach (Collider unit in positiveCollider)
+                {
+                    unit.GetComponent<InheriteStatus>().ApplyStatusEffect(StatusEffect.Heal, 10, 10);
+                }
+            }
+        }
+
     }
 
     private void OnTriggerExit(Collider unit)
