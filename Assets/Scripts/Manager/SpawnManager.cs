@@ -69,7 +69,7 @@ public class SpawnManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        InitialResistQueue();
+        InitialRegistQueue();
         InitialSpawnEnemy();
         //InvokeRepeating("AutoSpawnEnemyUnit", 0f, 1f);
     }
@@ -79,7 +79,7 @@ public class SpawnManager : MonoBehaviour
         //AutoSpawnEnemyUnit();
     }
 
-    public void InitialResistQueue()
+    public void InitialRegistQueue()
     {
         //if (player == PlayerDefine.Player)
         //{
@@ -87,28 +87,28 @@ public class SpawnManager : MonoBehaviour
         //}
 
         // 윗 라인
-        ResistUnitQueue(UnitType.Orc, LineType.Top, 3);
-        ResistUnitQueue(UnitType.BoneArcher, LineType.Top, 2);
-        ResistUnitQueue(UnitType.Orc, LineType.Top, 3);
-        ResistUnitQueue(UnitType.BoneArcher, LineType.Top, 2);
-        ResistUnitQueue(UnitType.Destroyer, LineType.Top, 1);
+        RegistUnitQueue(UnitType.Orc, LineType.Top, 3);
+        RegistUnitQueue(UnitType.BoneArcher, LineType.Top, 2);
+        RegistUnitQueue(UnitType.Orc, LineType.Top, 3);
+        RegistUnitQueue(UnitType.BoneArcher, LineType.Top, 2);
+        RegistUnitQueue(UnitType.Destroyer, LineType.Top, 1);
 
         // 중간 라인
-        //ResistUnitQueue(UnitType.Orc, LineType.Middle, 3);
-        //ResistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
-        //ResistUnitQueue(UnitType.Orc, LineType.Middle, 3);
-        //ResistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
-        //ResistUnitQueue(UnitType.Destroyer, LineType.Middle, 1);
+        //RegistUnitQueue(UnitType.Orc, LineType.Middle, 3);
+        //RegistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
+        //RegistUnitQueue(UnitType.Orc, LineType.Middle, 3);
+        //RegistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
+        //RegistUnitQueue(UnitType.Destroyer, LineType.Middle, 1);
 
         // 밑 라인
-        //ResistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
-        //ResistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
-        //ResistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
-        //ResistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
-        //ResistUnitQueue(UnitType.Destroyer, LineType.Bottom, 1);
+        //RegistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
+        //RegistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
+        //RegistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
+        //RegistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
+        //RegistUnitQueue(UnitType.Destroyer, LineType.Bottom, 1);
     }
 
-    public void ResistUnitQueue(UnitType type, LineType line, int count)
+    public void RegistUnitQueue(UnitType type, LineType line, int count)
     {
         for(int i = 0; i < count; i++)
         {
@@ -149,7 +149,7 @@ public class SpawnManager : MonoBehaviour
         //SpawnUnitPosition(UnitType.Destroyer, spawnLocation, LineType.Middle, SpawnType.Initial, 1);
     }
 
-    public void ResistRoute(Queue<Transform> route, LineType type)
+    public void RegistRoute(Queue<Transform> route, LineType type)
     {
         switch (type)
         {

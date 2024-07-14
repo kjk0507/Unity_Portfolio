@@ -36,9 +36,30 @@ namespace UnitStatusStruct
         // 이동 여부
         public MoveType moveType;
 
+        // 전초기지 소속 여부
+        public bool isInOutPost = false;
+        public GameObject curOutPost;
+
         public Status()
         {
 
+        }
+
+        public Status(OutPostType type)
+        {
+            this.name = "OutPost";
+            this.curHp = 100;
+            this.curAtk = 10;
+            this.curDef = 0;
+            this.curSpeed = 0;
+            this.attackRange = 0f;
+            this.attackSpeed = 0f;
+            this.moveType = MoveType.Stand;
+
+            this.finalHp = curHp;
+            this.finalAtk = curAtk;
+            this.finalDef = curDef;
+            this.finalSpeed = curSpeed;
         }
 
         public Status(UnitType unitType)
@@ -136,7 +157,6 @@ namespace UnitStatusStruct
             ChangeStatus(unitType);
         }
 
-
         private void ChangeStatus(UnitType unitType)
         {
             if (unitType == UnitType.Warrior || unitType == UnitType.Archer || unitType == UnitType.Wizard)
@@ -162,6 +182,13 @@ namespace UnitStatusStruct
 
         public void Damage(int attackPoint)
         {
+            // 만약 전초기지에 속해 있다면 전초기지가 대신 데미지 받음
+            if (isInOutPost && curOutPost != null)
+            {
+                curOutPost.GetComponent<OutpostControl>().status.Damage(attackPoint);
+                return;
+            }
+
             int damagePoint = attackPoint - this.finalDef;
             if (damagePoint < 0)
             {

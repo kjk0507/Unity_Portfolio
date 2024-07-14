@@ -4,6 +4,7 @@ using UnitStatusStruct;
 using UnityEngine.UI;
 using Unity.VisualScripting;
 using System.Collections.Generic;
+using static UnityEditor.Rendering.CameraUI;
 
 public class InheriteStatus : MonoBehaviour
 {
@@ -67,7 +68,7 @@ public class InheriteStatus : MonoBehaviour
         {
             this.targetOutPost = point;
             this.curPoint = CheckOutPostPoint(point);
-            SpawnManager.sm_instance.ResistRoute(routeQueue, row);
+            SpawnManager.sm_instance.RegistRoute(routeQueue, row);
         }
 
     }
@@ -524,6 +525,18 @@ public class InheriteStatus : MonoBehaviour
         }
 
         return point;
+    }
+
+    public void RegistOutPost(GameObject outPost)
+    {
+        this.status.isInOutPost = true;
+        this.status.curOutPost = outPost;
+    }
+
+    public void RemoveOutPost()
+    {
+        this.status.isInOutPost = false;
+        this.status.curOutPost = null;
     }
 
     private void OnCollisionEnter(Collision unit)
