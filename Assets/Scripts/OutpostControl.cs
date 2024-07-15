@@ -8,14 +8,6 @@ using UnityEngine.UI;
 
 public class OutpostControl : MonoBehaviour
 {
- 
-    // 비어있는건 점령 가능 -> 아군은 상대 전초기지나 비어있는 전초기지를 넘어갈수 없음(근데 그렇다고 idle로 변경시키면 적에게 맞아 디질텐데?) -> 넘어갈수 없다고 했으니 ㄱㅊ 사거리가 닿는 경우에 attack으로 변경
-    // 게이지 체우면 점령(layer로 구분) -> 점령중 bool 필요, 점령 게이지
-    // 방어 건물... 이건 그냥 별도로 설치 하는 걸로
-    // 점령상태에선 대기, 전진 상태 전환이 가능, 비점령시 대기
-    // 점령상태의 전초기지는 일정 범위 안에 있는 아군에게 힐을 줌
-    // 점령상태의 전초기지는 적에게 데미지를 입힘(결계 느낌)
-
     //bool isWaiting = true; // 대기 상태
     public GameObject body_Black;
     public GameObject body_Blue;
@@ -115,11 +107,6 @@ public class OutpostControl : MonoBehaviour
     }
     public void CheckUnitCount()
     {
-        // 이거 안될꺼 같으면 걍 trigger로 처리, list 만들어서 ontrigger랑 exit 트리거로 관리
-        //warriorNum = UnitManager.um_instance.CheckUnitListNum(this.gameObject, UnitType.Warrior);
-        //archerNum = UnitManager.um_instance.CheckUnitListNum(this.gameObject, UnitType.Archer);
-        //wizardNum = UnitManager.um_instance.CheckUnitListNum(this.gameObject, UnitType.Wizard);
-
         for (int i = warriorList.Count - 1; i >= 0; i--)
         {
             if (warriorList[i] == null)
@@ -197,6 +184,19 @@ public class OutpostControl : MonoBehaviour
                 isBroke = false;
                 curType = OutPostType.Active_Player;
                 ChangeOutPostType(curType);
+
+                foreach (GameObject unit in warriorList)
+                {
+                    unit.GetComponent<InheriteStatus>().RegistOutPost(gameObject);
+                }
+                foreach (GameObject unit in archerList)
+                {
+                    unit.GetComponent<InheriteStatus>().RegistOutPost(gameObject);
+                }
+                foreach (GameObject unit in wizardList)
+                {
+                    unit.GetComponent<InheriteStatus>().RegistOutPost(gameObject);
+                }
 
                 occupationGage = 0;
                 return;
@@ -402,7 +402,10 @@ public class OutpostControl : MonoBehaviour
                     break;
             }
 
-            unit.GetComponent<InheriteStatus>().RegistOutPost(gameObject);
+            if(curType == OutPostType.Active_Player)
+            {
+                unit.GetComponent<InheriteStatus>().RegistOutPost(gameObject);
+            }
         }
     }
 

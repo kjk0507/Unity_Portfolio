@@ -149,8 +149,8 @@ namespace UnitStatusStruct
                 this.curAtk = 30;
                 this.curDef = 0;
                 this.curSpeed = 3;
-                this.attackRange = 50f;
-                this.attackSpeed = 0f;
+                this.attackRange = 60f;
+                this.attackSpeed = 100f;
                 this.moveType = MoveType.Stand;
             }
 

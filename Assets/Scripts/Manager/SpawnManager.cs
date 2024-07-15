@@ -136,8 +136,8 @@ public class SpawnManager : MonoBehaviour
         //}
 
         // 01열
-        SpawnUnitPosition(UnitType.Orc, point_01, LineType.Top, SpawnType.Initial, 3);
-        SpawnUnitPosition(UnitType.BoneArcher, point_01, LineType.Top, SpawnType.Initial, 1);
+        //SpawnUnitPosition(UnitType.Orc, point_01, LineType.Top, SpawnType.Initial, 3);
+        //SpawnUnitPosition(UnitType.BoneArcher, point_01, LineType.Top, SpawnType.Initial, 1);
 
         //SpawnUnitPosition(UnitType.Orc, point_11, LineType.Middle, SpawnType.Initial, 3);
         //SpawnUnitPosition(UnitType.BoneArcher, point_11, LineType.Middle, SpawnType.Initial, 1);
@@ -145,8 +145,18 @@ public class SpawnManager : MonoBehaviour
         //SpawnUnitPosition(UnitType.Orc, point_21, LineType.Bottom, SpawnType.Initial, 3);
         //SpawnUnitPosition(UnitType.BoneArcher, point_21, LineType.Bottom, SpawnType.Initial, 1);
 
+        // 02열
+        SpawnUnitPosition(UnitType.Tower, point_02, LineType.Top, SpawnType.Initial, 1);
+        SpawnUnitPosition(UnitType.Tower, point_12, LineType.Middle, SpawnType.Initial, 1);
+        SpawnUnitPosition(UnitType.Tower, point_22, LineType.Bottom, SpawnType.Initial, 1);
+
+        // 03열
+        SpawnUnitPosition(UnitType.Door, point_03, LineType.Top, SpawnType.Initial, 1);
+        SpawnUnitPosition(UnitType.Door, point_13, LineType.Middle, SpawnType.Initial, 1);
+        SpawnUnitPosition(UnitType.Door, point_23, LineType.Bottom, SpawnType.Initial, 1);
+
         // 스폰포인트
-        SpawnUnitPosition(UnitType.Destroyer, point_01, LineType.Middle, SpawnType.Initial, 1);
+        //SpawnUnitPosition(UnitType.Destroyer, point_01, LineType.Middle, SpawnType.Initial, 1);
     }
 
     public void RegistRoute(Queue<Transform> route, LineType type)
@@ -234,11 +244,11 @@ public class SpawnManager : MonoBehaviour
             unit.transform.rotation = Quaternion.Euler(0, -90, 0); 
             if(type == UnitType.Tower)
             {
-                unit.transform.position = spawnPosition.position + new Vector3(10, 0, 0);
+                unit.transform.position = spawnPosition.position + new Vector3(-20, 0, 0);
             }
             if(type == UnitType.Door)
             {
-                unit.transform.position = spawnPosition.position;
+                unit.transform.position = spawnPosition.position + new Vector3(-25, 0, 0); ;
                 unit.transform.rotation = Quaternion.Euler(0, 0, 0);
             }
 

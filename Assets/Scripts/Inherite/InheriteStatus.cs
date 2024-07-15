@@ -290,8 +290,15 @@ public class InheriteStatus : MonoBehaviour
         // idle : 타겟과 거리가 사거리보다 작은 경우
         // move : 이동을 통해 거리가 사거리보다 작은 경우
 
-        // 타겟이 사망하는 경우 idle로 전환, collider가 없는 경우에도 사망으로 처리        
 
+        // 고정형인 경우 다음 타깃 바로 찾음
+        if (this.status.moveType == MoveType.Stand)
+        {
+            ChangeCurState(UnitState.Idle);
+            return;
+        }
+
+        // 타겟이 사망하는 경우 idle로 전환, collider가 없는 경우에도 사망으로 처리        
         // collider 없다는 건 사망했다는 의미로 타겟을 삭제 처리
         if (isAttack)
         {
@@ -305,6 +312,7 @@ public class InheriteStatus : MonoBehaviour
                 return;
             }
         }
+
     }
 
     public void ActionDeath()
