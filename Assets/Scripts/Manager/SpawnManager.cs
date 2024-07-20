@@ -136,6 +136,7 @@ public class SpawnManager : MonoBehaviour
         //}
 
         // 01열
+        //SpawnUnitPosition(UnitType.Tower, point_01, LineType.Top, SpawnType.Initial, 1);
         //SpawnUnitPosition(UnitType.Orc, point_01, LineType.Top, SpawnType.Initial, 3);
         //SpawnUnitPosition(UnitType.BoneArcher, point_01, LineType.Top, SpawnType.Initial, 1);
 

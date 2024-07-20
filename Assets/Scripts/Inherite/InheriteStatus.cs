@@ -322,6 +322,14 @@ public class InheriteStatus : MonoBehaviour
             return;
         }
 
+        if(playerDefine == PlayerDefine.Player)
+        {
+            GameManager.gm_instance.AddDeathCount();
+        } else if (playerDefine == PlayerDefine.Enemy)
+        {
+            GameManager.gm_instance.AddKillCount();
+        }
+
         if (this.status.moveType == MoveType.Stand)
         {
             Destroy(gameObject);

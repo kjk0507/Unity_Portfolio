@@ -54,11 +54,14 @@ public class ChargingAttack : MonoBehaviour
             quaternion = Quaternion.identity;
             //direction = -transform.right;
             //direction = -transform.right;
-            //direction = (target.position - firePosition.position).normalized;
-            direction = firePosition.forward;
+            direction = (target.position - firePosition.position).normalized;
+            //direction = firePosition.up;
             rotation = Quaternion.LookRotation(direction);
+            Vector3 eulerRotation = rotation.eulerAngles;
+            eulerRotation.y -= 90f;
+            rotation = Quaternion.Euler(eulerRotation);
 
-            GameObject ball = Instantiate(prefab, firePosition.position, quaternion);
+            GameObject ball = Instantiate(prefab, firePosition.position, rotation);
             ball.transform.rotation = rotation;
             ball.GetComponent<ProjectileControl>().Initialize(this.status.curTarget, DamageType.Target, PlayerDefine.Enemy, this.status.attackSpeed, this.status.finalAtk);
 

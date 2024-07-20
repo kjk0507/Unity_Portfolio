@@ -9,10 +9,17 @@ public class GameManager : MonoBehaviour
     public GameObject presentOutpost;
     public int ruby; // 상점 재화
     public int gold; // 인게임 생성 재화
+    public int extraGold; // 추가 골드
 
     public GameObject topOutPost;
     public GameObject middleOutPost;
     public GameObject bottomOutPost;
+
+    // 타워 정보
+    public int beforOutPostNum = 0;
+    public int outPostNum;
+    public int killCount;
+    public int deathCount;
 
     void Awake()
     {
@@ -36,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        
+        UpdateTowerInfo();
     }
 
     public GameObject GetPresentOutPost()
@@ -63,7 +70,8 @@ public class GameManager : MonoBehaviour
 
     public void AddGold()
     {
-        gold++;
+        //gold++;
+        gold = gold + 1 + extraGold + outPostNum * 10;
         //Debug.Log("Gold: " + gold);
     }
 
@@ -78,8 +86,65 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void UpgradeExtraGold()
+    {
+        extraGold++;
+    }
+
+    public void UseGold(int cost)
+    {
+        gold -= cost;
+    }
+
     public int GetGold()
     {
         return gold;
+    }
+
+    public void UpdateTowerInfo()
+    {
+        if(beforOutPostNum != outPostNum)
+        {
+            beforOutPostNum = outPostNum;
+            UIManager.UM_instance.ChangeTowerInfo();
+        }
+    }
+
+    public void AddKillCount()
+    {
+        killCount++;
+    }
+
+    public void AddDeathCount()
+    {
+        deathCount++;
+    }
+
+    public void AddOutPostNum()
+    {
+        outPostNum++;
+    }
+
+    public void RemoveOutPostNum()
+    {
+        if(outPostNum > 0)
+        {
+            outPostNum--;
+        }
+    }
+
+    public int GetKillCount()
+    {
+        return killCount;
+    }
+
+    public int GetDeathCount()
+    {
+        return deathCount;
+    }
+
+    public int GetOutPostNum()
+    {
+        return outPostNum;
     }
 }

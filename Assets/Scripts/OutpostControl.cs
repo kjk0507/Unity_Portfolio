@@ -254,6 +254,7 @@ public class OutpostControl : MonoBehaviour
                 hpBar.gameObject.SetActive(false);
                 gageBarImage.gameObject.SetActive(true);
                 ChangeOutPostState(OutPostState.InActive);
+                GameManager.gm_instance.RemoveOutPostNum();
                 break;
             case OutPostType.Active_Player:
                 body_Black.SetActive(false);
@@ -263,6 +264,7 @@ public class OutpostControl : MonoBehaviour
                 hpBar.gameObject.SetActive(true);
                 gageBarImage.gameObject.SetActive(false);
                 ChangeOutPostState(OutPostState.Wait);
+                GameManager.gm_instance.AddOutPostNum();
                 break;
             case OutPostType.Active_Enemy:
                 body_Black.SetActive(false);

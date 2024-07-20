@@ -309,4 +309,137 @@ public class UnitManager : MonoBehaviour
 
         return point;
     }
+
+    public void ChangeUpgradeStatus(UnitType utype, UpgradeType ugType)
+    {
+        int curGold = GameManager.gm_instance.GetGold();
+        float cost = GetUnitUpgradeCost(utype, ugType);
+
+        //if (curGold < cost)
+        //{
+        //    UIManager.UM_instance.ShowMessage("골드가 부족합니다.");
+        //    return;
+        //}
+
+        UIManager.UM_instance.ShowMessage("강화에 성공하셨습니다.");
+
+        switch (utype)
+        {
+            case UnitType.Warrior:
+                switch (ugType)
+                {
+                    case UpgradeType.Hp:
+                        warrior_upgrade_hp++;
+                        break;
+                    case UpgradeType.Attack:
+                        warrior_upgrade_atk++;
+                        break;
+                    case UpgradeType.Defence:
+                        warrior_upgrade_def++;
+                        break;
+                    case UpgradeType.Speed:
+                        warrior_upgrade_speed++;
+                        break;
+                }
+                break;
+            case UnitType.Archer:
+                switch (ugType)
+                {
+                    case UpgradeType.Hp:
+                        archer_upgrade_hp++;
+                        break;
+                    case UpgradeType.Attack:
+                        archer_upgrade_atk++;
+                        break;
+                    case UpgradeType.Defence:
+                        archer_upgrade_def++;
+                        break;
+                    case UpgradeType.Speed:
+                        archer_upgrade_speed++;
+                        break;
+                }
+                break;
+            case UnitType.Wizard:
+                switch (ugType)
+                {
+                    case UpgradeType.Hp:
+                        wizard_upgrade_hp++;
+                        break;
+                    case UpgradeType.Attack:
+                        wizard_upgrade_atk++;
+                        break;
+                    case UpgradeType.Defence:
+                        wizard_upgrade_def++;
+                        break;
+                    case UpgradeType.Speed:
+                        wizard_upgrade_speed++;
+                        break;
+                }
+                break;
+        }
+    }
+
+    public float GetUnitUpgradeCost(UnitType utype, UpgradeType ugType)
+    {
+        float result = 0;
+
+        switch (utype)
+        {
+            case UnitType.Warrior:
+                switch (ugType)
+                {
+                    case UpgradeType.Hp:
+                        result = warrior_upgrade_hp;
+                        break;
+                    case UpgradeType.Attack:
+                        result = warrior_upgrade_atk;
+                        break;
+                    case UpgradeType.Defence:
+                        result = warrior_upgrade_def;
+                        break;
+                    case UpgradeType.Speed:
+                        result = warrior_upgrade_speed;
+                        break;
+                }
+                break;
+            case UnitType.Archer:
+                switch (ugType)
+                {
+                    case UpgradeType.Hp:
+                        result = archer_upgrade_hp;
+                        break;
+                    case UpgradeType.Attack:
+                        result = archer_upgrade_atk;
+                        break;
+                    case UpgradeType.Defence:
+                        result = archer_upgrade_def;
+                        break;
+                    case UpgradeType.Speed:
+                        result = archer_upgrade_speed;
+                        break;
+                }
+                break;
+            case UnitType.Wizard:
+                switch (ugType)
+                {
+                    case UpgradeType.Hp:
+                        result = wizard_upgrade_hp;
+                        break;
+                    case UpgradeType.Attack:
+                        result = wizard_upgrade_atk;
+                        break;
+                    case UpgradeType.Defence:
+                        result = wizard_upgrade_def;
+                        break;
+                    case UpgradeType.Speed:
+                        result = wizard_upgrade_speed;
+                        break;
+                }
+                break;
+        }
+
+        result = (result + 1) * 100;
+
+        return result;
+    }
 }

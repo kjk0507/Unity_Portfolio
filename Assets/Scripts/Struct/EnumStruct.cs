@@ -102,4 +102,35 @@ namespace EnumStruct
         Heal,
         ElectricShock
     }
+
+    public enum UIStatusType // 타워, 용병
+    {
+        Tower,
+        Unit
+    }
+
+    public enum UIUpgradeButton
+    {
+        Gold,
+        Hp,
+        Attack,
+        Defence,
+        Speed
+    }
+
+    public enum UIUnitType
+    {
+        Unit0,
+        Unit1,
+        Unit2,
+        Unit3
+    }
+
+    public enum UpgradeType
+    {
+        Hp,
+        Attack, 
+        Defence,
+        Speed
+    }
 }

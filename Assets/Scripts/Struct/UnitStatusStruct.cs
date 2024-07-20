@@ -13,18 +13,23 @@ namespace UnitStatusStruct
         // 스테이터스
         public int finalHp;
         public int curHp = 1;
+        public int defaultHp;
         public float finalSpeed;
         public float curSpeed;
+        public float defaultSpeed;
 
         // 공격 관련
         public int finalAtk;
         public int curAtk;
+        public int defaultAtk;
         public float attackRange;
         public float attackSpeed; // 투사체의 경우
+        public DamageType damageType;
 
         // 방어 관련
         public int finalDef;
         public int curDef;
+        public int defaultDef;
 
         // 목표 타겟 관련
         public GameObject outPostLocation;
@@ -60,13 +65,18 @@ namespace UnitStatusStruct
             this.finalAtk = curAtk;
             this.finalDef = curDef;
             this.finalSpeed = curSpeed;
+
+            this.defaultHp = curHp;
+            this.defaultAtk = curAtk;
+            this.defaultDef = curDef;
+            this.defaultSpeed = curSpeed;
         }
 
         public Status(UnitType unitType)
         {
             if (unitType == UnitType.Warrior)
             {
-                this.name = "Warrior";
+                this.name = "전사";
                 this.curHp = 100;
                 this.curAtk = 10;
                 this.curDef = 0;
@@ -74,10 +84,11 @@ namespace UnitStatusStruct
                 this.attackRange = 10f;
                 this.attackSpeed = 1f;
                 this.moveType = MoveType.Move;
+                this.damageType = DamageType.Target;
             }
             else if(unitType == UnitType.Archer)
             {
-                this.name = "Archer";
+                this.name = "궁수";
                 this.curHp = 70;
                 this.curAtk = 20;
                 this.curDef = 0;
@@ -85,11 +96,12 @@ namespace UnitStatusStruct
                 this.attackRange = 20f;
                 this.attackSpeed = 50f;
                 this.moveType = MoveType.Move;
+                this.damageType = DamageType.Target;
 
             }
             else if(unitType == UnitType.Wizard)
             {
-                this.name = "Wizard";
+                this.name = "마법사";
                 this.curHp = 100;
                 this.curAtk = 40;
                 this.curDef = 0;
@@ -97,6 +109,7 @@ namespace UnitStatusStruct
                 this.attackRange = 35f;
                 this.attackSpeed= 35f;
                 this.moveType = MoveType.Move;
+                this.damageType = DamageType.AOE;
             }
             else if (unitType == UnitType.Orc)
             {
@@ -153,6 +166,11 @@ namespace UnitStatusStruct
                 this.attackSpeed = 100f;
                 this.moveType = MoveType.Stand;
             }
+
+            this.defaultHp = curHp;
+            this.defaultAtk = curAtk;
+            this.defaultDef = curDef;
+            this.defaultSpeed = curSpeed;
 
             ChangeStatus(unitType);
         }
