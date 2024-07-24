@@ -71,7 +71,7 @@ public class SpawnManager : MonoBehaviour
 
         InitialRegistQueue();
         InitialSpawnEnemy();
-        //InvokeRepeating("AutoSpawnEnemyUnit", 0f, 1f);
+        InvokeRepeating("AutoSpawnEnemyUnit", 0f, 1f);
     }
 
     void Update()
@@ -94,18 +94,18 @@ public class SpawnManager : MonoBehaviour
         RegistUnitQueue(UnitType.Destroyer, LineType.Top, 1);
 
         // 중간 라인
-        //RegistUnitQueue(UnitType.Orc, LineType.Middle, 3);
-        //RegistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
-        //RegistUnitQueue(UnitType.Orc, LineType.Middle, 3);
-        //RegistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
-        //RegistUnitQueue(UnitType.Destroyer, LineType.Middle, 1);
+        RegistUnitQueue(UnitType.Orc, LineType.Middle, 3);
+        RegistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
+        RegistUnitQueue(UnitType.Orc, LineType.Middle, 3);
+        RegistUnitQueue(UnitType.BoneArcher, LineType.Middle, 2);
+        RegistUnitQueue(UnitType.Destroyer, LineType.Middle, 1);
 
         // 밑 라인
-        //RegistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
-        //RegistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
-        //RegistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
-        //RegistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
-        //RegistUnitQueue(UnitType.Destroyer, LineType.Bottom, 1);
+        RegistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
+        RegistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
+        RegistUnitQueue(UnitType.Orc, LineType.Bottom, 3);
+        RegistUnitQueue(UnitType.BoneArcher, LineType.Bottom, 2);
+        RegistUnitQueue(UnitType.Destroyer, LineType.Bottom, 1);
     }
 
     public void RegistUnitQueue(UnitType type, LineType line, int count)
@@ -135,21 +135,33 @@ public class SpawnManager : MonoBehaviour
         //    return;
         //}
 
-        // 01열
-        //SpawnUnitPosition(UnitType.Tower, point_01, LineType.Top, SpawnType.Initial, 1);
-        //SpawnUnitPosition(UnitType.Orc, point_01, LineType.Top, SpawnType.Initial, 3);
-        //SpawnUnitPosition(UnitType.BoneArcher, point_01, LineType.Top, SpawnType.Initial, 1);
+        // 아군 코어
+        SpawnUnitPosition(UnitType.Core, point_00, LineType.Top, SpawnType.Initial, 1);
+        SpawnUnitPosition(UnitType.Core, point_10, LineType.Middle, SpawnType.Initial, 1);
+        SpawnUnitPosition(UnitType.Core, point_20, LineType.Bottom, SpawnType.Initial, 1);
 
-        //SpawnUnitPosition(UnitType.Orc, point_11, LineType.Middle, SpawnType.Initial, 3);
-        //SpawnUnitPosition(UnitType.BoneArcher, point_11, LineType.Middle, SpawnType.Initial, 1);
+        // 01열        
+        SpawnUnitPosition(UnitType.Orc, point_01, LineType.Top, SpawnType.Initial, 3);
+        SpawnUnitPosition(UnitType.BoneArcher, point_01, LineType.Top, SpawnType.Initial, 1);
 
-        //SpawnUnitPosition(UnitType.Orc, point_21, LineType.Bottom, SpawnType.Initial, 3);
-        //SpawnUnitPosition(UnitType.BoneArcher, point_21, LineType.Bottom, SpawnType.Initial, 1);
+        SpawnUnitPosition(UnitType.Orc, point_11, LineType.Middle, SpawnType.Initial, 3);
+        SpawnUnitPosition(UnitType.BoneArcher, point_11, LineType.Middle, SpawnType.Initial, 1);
+
+        SpawnUnitPosition(UnitType.Orc, point_21, LineType.Bottom, SpawnType.Initial, 3);
+        SpawnUnitPosition(UnitType.BoneArcher, point_21, LineType.Bottom, SpawnType.Initial, 1);
 
         // 02열
         SpawnUnitPosition(UnitType.Tower, point_02, LineType.Top, SpawnType.Initial, 1);
+        SpawnUnitPosition(UnitType.Orc, point_02, LineType.Top, SpawnType.Initial, 2);
+        SpawnUnitPosition(UnitType.BoneArcher, point_02, LineType.Top, SpawnType.Initial, 2);
+
         SpawnUnitPosition(UnitType.Tower, point_12, LineType.Middle, SpawnType.Initial, 1);
+        SpawnUnitPosition(UnitType.Orc, point_12, LineType.Middle, SpawnType.Initial, 2);
+        SpawnUnitPosition(UnitType.BoneArcher, point_12, LineType.Middle, SpawnType.Initial, 2);
+
         SpawnUnitPosition(UnitType.Tower, point_22, LineType.Bottom, SpawnType.Initial, 1);
+        SpawnUnitPosition(UnitType.Orc, point_22, LineType.Bottom, SpawnType.Initial, 2);
+        SpawnUnitPosition(UnitType.BoneArcher, point_22, LineType.Bottom, SpawnType.Initial, 2);
 
         // 03열
         SpawnUnitPosition(UnitType.Door, point_03, LineType.Top, SpawnType.Initial, 1);
@@ -211,6 +223,9 @@ public class SpawnManager : MonoBehaviour
             case UnitType.Tower:
                 prefabPath = "Prefabs/Building/Tower";
                 break;
+            case UnitType.Core:
+                prefabPath = "Prefabs/Building/Core";
+                break;
         }
 
         switch (line)
@@ -247,13 +262,17 @@ public class SpawnManager : MonoBehaviour
             {
                 unit.transform.position = spawnPosition.position + new Vector3(-20, 0, 0);
             }
-            if(type == UnitType.Door)
+            else if(type == UnitType.Door)
             {
                 unit.transform.position = spawnPosition.position + new Vector3(-25, 0, 0); ;
                 unit.transform.rotation = Quaternion.Euler(0, 0, 0);
             }
+            else if (type == UnitType.Core)
+            {
+                unit.transform.position = spawnPosition.position + new Vector3(-15, 0, 0);
+            }
 
-            unit.GetComponent<EnemyStatus>().Initialize(type, line, spawnType, null, outPostPoint, finalTargetEnemy);
+            unit.GetComponent<InheriteStatus>().Initialize(type, line, spawnType, null, outPostPoint, finalTargetEnemy);
             unit.transform.SetParent(parentLine.transform);
         }
     }
@@ -263,12 +282,21 @@ public class SpawnManager : MonoBehaviour
         UnitType type = (UnitType)System.Enum.ToObject(typeof(UnitType), slotNum);
         LineType line = 0;
 
-        string outpost_name = GameManager.gm_instance.GetPresentOutPost().name;
-
-        if(outpost_name == null)
+        if(GameManager.gm_instance.GetGold() < GetCost(type))
         {
+            UIManager.um_instance.ShowMessage("골드가 부족합니다");
             return;
         }
+
+        if(GameManager.gm_instance.GetPresentOutPost() == null)
+        {
+            UIManager.um_instance.ShowMessage("라인을 선택해주십시오");
+            return;
+        }
+
+        GameManager.gm_instance.UseGold(GetCost(type));
+
+        string outpost_name = GameManager.gm_instance.GetPresentOutPost().name;
 
         switch (outpost_name)
         {
@@ -287,7 +315,27 @@ public class SpawnManager : MonoBehaviour
         {
             ChangeUnitTypeSpawn(line, type);
         }
-    } 
+    }
+
+    public int GetCost(UnitType type)
+    {
+        int result = -1;
+
+        switch (type)
+        {
+            case UnitType.Warrior:
+                result = 10;
+                break;
+            case UnitType.Archer:
+                result = 50;
+                break;
+            case UnitType.Wizard:
+                result = 100;
+                break;
+        }
+
+        return result;
+    }
 
     private void ChangeUnitTypeSpawn(LineType line, UnitType type)
     {
@@ -363,20 +411,20 @@ public class SpawnManager : MonoBehaviour
 
     public void SpawnUnitLine()
     {
-        if (topLineUnitNum < 10 && topLineQueue.Count > 0)
+        if (topLineUnitNum < 5 && topLineQueue.Count > 0)
         {
             UnitType type = topLineQueue.Dequeue();
             SpawnUnitPosition(type, spawnLocationEnemy, LineType.Top, SpawnType.Spawn, 1);
 
         }
 
-        if (middleLineUnitNum < 10 && middleLineQueue.Count > 0)
+        if (middleLineUnitNum < 5 && middleLineQueue.Count > 0)
         {
             UnitType type = middleLineQueue.Dequeue();
             SpawnUnitPosition(type, spawnLocationEnemy, LineType.Middle, SpawnType.Spawn, 1);
         }
 
-        if (bottomLineUnitNum < 10 && bottomLineQueue.Count > 0)
+        if (bottomLineUnitNum < 5 && bottomLineQueue.Count > 0)
         {
             UnitType type = bottomLineQueue.Dequeue();
             SpawnUnitPosition(type, spawnLocationEnemy, LineType.Bottom, SpawnType.Spawn, 1);

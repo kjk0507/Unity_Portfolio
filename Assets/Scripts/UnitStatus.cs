@@ -6,7 +6,15 @@ public class UnitStatus : InheriteStatus
     private void Start()
     {
         playerDefine = PlayerDefine.Player;
-        animator = GetComponent<Animator>();
+        if(unitType == UnitType.Castle)
+        {
+            Initialize(UnitType.Castle, LineType.Middle, SpawnType.Initial, null, null, null);
+        }
+
+        if (this.status.moveType == MoveType.Move)
+        {
+            animator = GetComponent<Animator>();
+        }
         outPostLayerMask = LayerMask.NameToLayer("OutPost");
         enemyLayerMask = LayerMask.NameToLayer("Enemy");
         findLayerMask = LayerMask.GetMask("Enemy");
@@ -40,7 +48,10 @@ public class UnitStatus : InheriteStatus
         Vector3 direction;
         Quaternion rotation;
 
-        transform.LookAt(this.status.curTarget.transform);
+        if(this.status.curTarget != null)
+        {
+            transform.LookAt(this.status.curTarget.transform);
+        }
 
         switch (unitType)
         {

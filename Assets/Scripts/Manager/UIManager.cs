@@ -8,7 +8,16 @@ using static UnityEngine.Rendering.DebugUI;
 
 public class UIManager : MonoBehaviour
 {
-    public static UIManager UM_instance;
+    public static UIManager um_instance;
+
+    // UI 순서
+    public UIState curState;
+    public GameObject titleUi;
+    public GameObject mainUi;
+    public GameObject playUi;
+    public GameObject gameoverUi;
+    public GameObject theEndUi;
+    public GameObject gameField;
 
     public TextMeshProUGUI clickedOutpost;
 
@@ -23,6 +32,7 @@ public class UIManager : MonoBehaviour
 
     // 상태창 관련
     public GameObject playerInfo;
+    public bool isStatusOpen = false;
     // 타워 정보
     public GameObject towerStatus;
     public TextMeshProUGUI outPostNum; // 점령지 수
@@ -58,14 +68,16 @@ public class UIManager : MonoBehaviour
 
     void Start()
     {
-        if (UM_instance == null)
+        if (um_instance == null)
         {
-            UM_instance = this;
+            um_instance = this;
         }
-        else if (UM_instance != this)
+        else if (um_instance != this)
         {
             Destroy(gameObject);
         }
+
+        ChangeUIState(0);
     }
 
     void Update()
@@ -212,6 +224,13 @@ public class UIManager : MonoBehaviour
 
     public void ClickedStatusTypeButton(int type)
     {
+        if (isStatusOpen)
+        {
+            CloseStatusTypeButton();
+            return;
+        }
+
+        isStatusOpen = true;
         playerInfo.SetActive(true);
         UIStatusType sType = (UIStatusType)type;
         ChangeUIType(sType);
@@ -236,6 +255,7 @@ public class UIManager : MonoBehaviour
 
     public void CloseStatusTypeButton()
     {
+        isStatusOpen = false;
         playerInfo.SetActive(false);
     }
 
@@ -364,11 +384,11 @@ public class UIManager : MonoBehaviour
         int curGold = GameManager.gm_instance.GetGold();
         int cost = (1 + GameManager.gm_instance.extraGold) * 100;
 
-        //if (curGold < cost)
-        //{
-        //    UIManager.UM_instance.ShowMessage("골드가 부족합니다.");
-        //    return;
-        //}
+        if (curGold < cost)
+        {
+            UIManager.um_instance.ShowMessage("골드가 부족합니다.");
+            return;
+        }
 
         GameManager.gm_instance.UpgradeExtraGold();
         ChangeTowerInfo();
@@ -386,9 +406,10 @@ public class UIManager : MonoBehaviour
 
         if (fadeOutCoroutine != null)
         {
-            curMessage.color = new Color(curMessage.color.r, curMessage.color.g, curMessage.color.b, 1f);
             StopCoroutine(fadeOutCoroutine);
         }
+
+        curMessage.color = new Color(curMessage.color.r, curMessage.color.g, curMessage.color.b, 1f);
 
         fadeOutCoroutine = StartCoroutine(FadeOutText(curMessage));
     }
@@ -408,5 +429,59 @@ public class UIManager : MonoBehaviour
         }
 
         messageObj.gameObject.SetActive(false);
+    }
+
+    public void ChangeUIState(int num)
+    {
+        UIState state = (UIState)num;
+
+        switch (state)
+        {
+            case UIState.Title:
+                curState = UIState.Title;
+                titleUi.SetActive(true);
+                mainUi.SetActive(false);
+                playUi.SetActive(false);
+                gameoverUi.SetActive(false);
+                theEndUi.SetActive(false);
+                //gameField.SetActive(false);
+                break;
+            case UIState.Main:
+                curState = UIState.Main;
+                titleUi.SetActive(false);
+                mainUi.SetActive(true);
+                playUi.SetActive(false);
+                gameoverUi.SetActive(false);
+                theEndUi.SetActive(false);
+                //gameField.SetActive(false);
+                break;
+            case UIState.Play:
+                curState = UIState.Play;
+                titleUi.SetActive(false);
+                mainUi.SetActive(false);
+                playUi.SetActive(true);
+                gameoverUi.SetActive(false);
+                theEndUi.SetActive(false);
+                //gameField.SetActive(true);
+                break;
+            case UIState.GameOver:
+                curState = UIState.GameOver;
+                titleUi.SetActive(false);
+                mainUi.SetActive(false);
+                playUi.SetActive(false);
+                gameoverUi.SetActive(true);
+                theEndUi.SetActive(false);
+                //gameField.SetActive(false);
+                break;
+            case UIState.TheEnd:
+                curState = UIState.TheEnd;
+                titleUi.SetActive(false);
+                mainUi.SetActive(false);
+                playUi.SetActive(false);
+                gameoverUi.SetActive(false);
+                theEndUi.SetActive(true);
+                //gameField.SetActive(false);
+                break;
+        }
     }
 }

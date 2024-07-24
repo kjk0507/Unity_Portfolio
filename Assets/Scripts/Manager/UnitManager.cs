@@ -315,13 +315,13 @@ public class UnitManager : MonoBehaviour
         int curGold = GameManager.gm_instance.GetGold();
         float cost = GetUnitUpgradeCost(utype, ugType);
 
-        //if (curGold < cost)
-        //{
-        //    UIManager.UM_instance.ShowMessage("골드가 부족합니다.");
-        //    return;
-        //}
+        if (curGold < cost)
+        {
+            UIManager.um_instance.ShowMessage("골드가 부족합니다.");
+            return;
+        }
 
-        UIManager.UM_instance.ShowMessage("강화에 성공하셨습니다.");
+        UIManager.um_instance.ShowMessage("강화에 성공하셨습니다.");
 
         switch (utype)
         {

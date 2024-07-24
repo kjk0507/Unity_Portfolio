@@ -13,6 +13,8 @@ public class ProjectileControl : MonoBehaviour
     public float curSpeed;
     public Rigidbody ri;
 
+    public int encount;
+
     int playerLayerMask;
     int enemyLayerMask;
 
@@ -25,7 +27,7 @@ public class ProjectileControl : MonoBehaviour
         playerLayerMask = LayerMask.NameToLayer("Player");
         enemyLayerMask = LayerMask.NameToLayer("Enemy");
 
-        Destroy(gameObject, 5f);
+        Destroy(gameObject, 3f);
     }
 
     void Update()
@@ -67,6 +69,12 @@ public class ProjectileControl : MonoBehaviour
             foreach (GameObject obj in targetList)
             {
                 list.Add(obj);
+                encount++;
+                
+                if(encount >= 3)
+                {
+                    break;
+                }
             }
 
             if(list != null)
@@ -79,6 +87,11 @@ public class ProjectileControl : MonoBehaviour
             }
 
             isDamage = false;
+
+            if(encount >= 3)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 

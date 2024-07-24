@@ -7,6 +7,11 @@ public class EnemyStatus : InheriteStatus
     private void Start()
     {
         playerDefine = PlayerDefine.Enemy;
+        if (unitType == UnitType.Castle)
+        {
+            Initialize(UnitType.Castle, LineType.Middle, SpawnType.Initial, null, null, null);
+        }
+
         if (this.status.moveType == MoveType.Move)
         {
             animator = GetComponent<Animator>();

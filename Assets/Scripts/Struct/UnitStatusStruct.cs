@@ -10,6 +10,9 @@ namespace UnitStatusStruct
         // 이름
         public string name;
 
+        // 가격
+        public int cost;
+
         // 스테이터스
         public int finalHp;
         public int curHp = 1;
@@ -77,6 +80,7 @@ namespace UnitStatusStruct
             if (unitType == UnitType.Warrior)
             {
                 this.name = "전사";
+                this.cost = 10;
                 this.curHp = 100;
                 this.curAtk = 10;
                 this.curDef = 0;
@@ -89,6 +93,7 @@ namespace UnitStatusStruct
             else if(unitType == UnitType.Archer)
             {
                 this.name = "궁수";
+                this.cost = 50;
                 this.curHp = 70;
                 this.curAtk = 20;
                 this.curDef = 0;
@@ -102,6 +107,7 @@ namespace UnitStatusStruct
             else if(unitType == UnitType.Wizard)
             {
                 this.name = "마법사";
+                this.cost = 100;
                 this.curHp = 100;
                 this.curAtk = 40;
                 this.curDef = 0;
@@ -110,6 +116,18 @@ namespace UnitStatusStruct
                 this.attackSpeed= 35f;
                 this.moveType = MoveType.Move;
                 this.damageType = DamageType.AOE;
+            }
+            else if (unitType == UnitType.Core)
+            {
+                this.name = "코어";
+                this.curHp = 100;
+                this.curAtk = 0;
+                this.curDef = 0;
+                this.curSpeed = 0;
+                this.attackRange = 0f;
+                this.attackSpeed = 0f;
+                this.moveType = MoveType.Stand;
+                this.damageType = DamageType.Target;
             }
             else if (unitType == UnitType.Orc)
             {
@@ -166,6 +184,17 @@ namespace UnitStatusStruct
                 this.attackSpeed = 100f;
                 this.moveType = MoveType.Stand;
             }
+            else if (unitType == UnitType.Castle)
+            {
+                this.name = "본성";
+                this.curHp = 500;
+                this.curAtk = 0;
+                this.curDef = 0;
+                this.curSpeed = 0;
+                this.attackRange = 0f;
+                this.attackSpeed = 0f;
+                this.moveType = MoveType.Stand;
+            }
 
             this.defaultHp = curHp;
             this.defaultAtk = curAtk;
@@ -214,7 +243,7 @@ namespace UnitStatusStruct
             }
 
             this.curHp = this.curHp - damagePoint;
-        }
+        }        
     }
 
 

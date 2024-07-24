@@ -271,7 +271,7 @@ public class OutpostControl : MonoBehaviour
                 body_Blue.SetActive(false);
                 body_Red.SetActive(true);
                 barrier.SetActive(false);
-                ChangeOutPostState(OutPostState.InActive);
+                ChangeOutPostState(OutPostState.Move);
                 break;
         }        
     }

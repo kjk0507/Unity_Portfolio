@@ -38,6 +38,14 @@ public class InheriteStatus : MonoBehaviour
 
     Queue<Transform> routeQueue = new Queue<Transform>();
 
+    // 부서지는 연출
+    public GameObject defaultObj;
+    public GameObject particleObj;
+
+    // 장비 위치
+    public GameObject rightHand;
+    public GameObject leftHand;
+
     void Start()
     {
         
@@ -82,11 +90,18 @@ public class InheriteStatus : MonoBehaviour
         // todo 대기(0), 이동(1), 공격(2), 사망(3) -> 행동 코드도 따라가야됨 : 애니메이션코드와 상태변경 코드가 같이 실행 될것!
         // 그 상태가 아니라면 실행 안함
 
+
         // 고정형은 애니메이션을 보내지 않음
         if (this.status.moveType != MoveType.Stand)
         {
             animator.SetInteger("unitState", (int)curState);
             animator.SetBool("isAttackMotion", isAttackMotion);
+        }
+
+        // 죽었으면 더이상 실행 안함
+        if (isDead)
+        {
+            return;
         }
 
         if (this.status.curHp <= 0)
@@ -201,8 +216,8 @@ public class InheriteStatus : MonoBehaviour
 
         // 목표가 없는 경우
         if ((this.status.curTarget == null && this.curPoint != OutPostPoint.None)
-            || (curPoint == OutPostPoint.Point_00 || curPoint == OutPostPoint.Point_10 || curPoint == OutPostPoint.Point_20) 
-            || (curPoint == OutPostPoint.Point_03 || curPoint == OutPostPoint.Point_13 || curPoint == OutPostPoint.Point_23))
+            || (this.status.curTarget == null && (curPoint == OutPostPoint.Point_00 || curPoint == OutPostPoint.Point_10 || curPoint == OutPostPoint.Point_20)) 
+            || (this.status.curTarget == null && (curPoint == OutPostPoint.Point_03 || curPoint == OutPostPoint.Point_13 || curPoint == OutPostPoint.Point_23)))
         {
             float distancePoint = Vector3.Distance(targetOutPost.transform.position, transform.position);
             Vector3 direction = (targetOutPost.transform.position - transform.position).normalized;
@@ -217,7 +232,7 @@ public class InheriteStatus : MonoBehaviour
                 return;
             }
 
-            // 포인터에 접근한 경우(플레이어)
+            // 포인터에 접근한 경우(적군)
             if (distancePoint < 2 && routeQueue.Count == 3 && playerDefine == PlayerDefine.Enemy)
             {
                 Transform route = routeQueue.Dequeue();
@@ -242,6 +257,59 @@ public class InheriteStatus : MonoBehaviour
         // 목표가 있는 경우
         if (this.status.curTarget != null)
         {
+            // 단 초기 전초기지에는 안 간 경우
+            if ((curPoint == OutPostPoint.Point_00 || curPoint == OutPostPoint.Point_10 || curPoint == OutPostPoint.Point_20)
+                || (curPoint == OutPostPoint.Point_03 || curPoint == OutPostPoint.Point_13 || curPoint == OutPostPoint.Point_23))
+            {
+                float distanceTarget = Vector3.Distance(this.status.curTarget.transform.position, transform.position);
+
+                float distancePoint = Vector3.Distance(targetOutPost.transform.position, transform.position);
+                Vector3 directionTarget = (targetOutPost.transform.position - transform.position).normalized;
+                Vector3 newPositionTarget = transform.position + directionTarget * this.status.curSpeed * Time.deltaTime;
+
+                // 포인터 도달 전 적이 더 가까운 경우 그쪽을 대상으로 함
+                if(distanceTarget <= distancePoint)
+                {
+                    curPoint = OutPostPoint.None; 
+                    return;
+                }
+
+                // 포인터에 접근한 경우(플레이어)
+                if (distancePoint < 2 && routeQueue.Count != 0 && playerDefine == PlayerDefine.Player)
+                {
+                    Transform route = routeQueue.Dequeue();
+                    curPoint = CheckOutPostPoint(route.gameObject);
+                    targetOutPost = route.gameObject;
+                    return;
+                } else if(distancePoint < 2 && routeQueue.Count == 0 && playerDefine == PlayerDefine.Player)
+                {
+                    curPoint = OutPostPoint.None;
+                    targetOutPost = null;
+                    return;
+                }
+
+                // 포인터에 접근한 경우(적군)
+                if (distancePoint < 2 && routeQueue.Count == 3 && playerDefine == PlayerDefine.Enemy)
+                {
+                    Transform route = routeQueue.Dequeue();
+                    curPoint = CheckOutPostPoint(route.gameObject);
+                    targetOutPost = route.gameObject;
+                    return;
+                }
+
+                // 포인터와 먼 경우
+                if (distancePoint > 2)
+                {
+                    transform.LookAt(targetOutPost.transform);
+                    transform.position = newPositionTarget;
+                    return;
+                }
+
+                // 포인터에 도달한 경우
+                ChangeCurState(UnitState.Idle);
+                return;
+            }
+
             GameObject curTarget = this.status.curTarget;
 
             float distance = Vector3.Distance(curTarget.transform.position, transform.position);
@@ -316,8 +384,13 @@ public class InheriteStatus : MonoBehaviour
     }
 
     public void ActionDeath()
-    {
-        if (curState != UnitState.Death)
+    {       
+        if(curState != UnitState.Death)
+        {
+            return;
+        }
+
+        if(unitType == UnitType.Castle)
         {
             return;
         }
@@ -332,8 +405,25 @@ public class InheriteStatus : MonoBehaviour
 
         if (this.status.moveType == MoveType.Stand)
         {
-            Destroy(gameObject);
-            return;
+            if(unitType == UnitType.Core)
+            {
+                GameManager.gm_instance.enemyMainTarget--;
+                defaultObj.SetActive(false);
+                particleObj.SetActive(true);
+
+                StartCoroutine(DelayDestroy());
+            }
+            else if(unitType == UnitType.Door) 
+            {
+                GameManager.gm_instance.playerMainTarget--;
+                Destroy(gameObject);
+                return;
+            }
+            else if(unitType == UnitType.Tower)
+            {
+                Destroy(gameObject);
+                return;
+            }
         }
 
         Collider collider = GetComponent<Collider>();
@@ -342,6 +432,11 @@ public class InheriteStatus : MonoBehaviour
         Rigidbody rb = GetComponent<Rigidbody>();
         rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.constraints = RigidbodyConstraints.FreezePosition;
+    }
+    private IEnumerator DelayDestroy()
+    {
+        yield return new WaitForSeconds(3f);
+        Destroy(gameObject);
     }
 
     public void TestDebugRay()
@@ -436,6 +531,10 @@ public class InheriteStatus : MonoBehaviour
         GameObject newTarget = null;
         float closestDistance = Mathf.Infinity;
         int checkUnitCount = 0;
+        float lineDistance = Mathf.Infinity;
+        float closeDistance = Mathf.Infinity;
+        GameObject lineTarget = null;
+        GameObject closeTarget = null;
 
         foreach (Transform unit in line)
         {
@@ -451,30 +550,61 @@ public class InheriteStatus : MonoBehaviour
                 if (distance < closestDistance)
                 {
                     closestDistance = distance;
-                    newTarget = unit.gameObject;
+                    lineTarget = unit.gameObject;
+                    //newTarget = unit.gameObject;
                 }
 
                 checkUnitCount++;
             }
+        }
+        // 라인 적 중 가까운 적
+        lineDistance = closestDistance;
 
+        // 레이어를 통한 적 탐지 방법
+        float searchRadius = 50f;
+        Vector3 currentPosition = transform.position;
+        Collider[] colliders = Physics.OverlapSphere(currentPosition, searchRadius, findLayerMask);
+
+        foreach (Collider obj in colliders)
+        {
+            float distance = Vector3.Distance(transform.position, obj.transform.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                closeTarget = obj.gameObject;
+                //newTarget = obj.transform.gameObject;
+            }
         }
 
-        if (checkUnitCount == 0)
-        {
-            // 레이어를 통한 적 탐지 방법
-            float searchRadius = 50f;
-            Vector3 currentPosition = transform.position;
-            Collider[] colliders = Physics.OverlapSphere(currentPosition, searchRadius, findLayerMask);
+        // 라인은 아닌데 가까운 적
+        closeDistance = closestDistance;
 
-            foreach (Collider obj in colliders)
-            {
-                float distance = Vector3.Distance(transform.position, obj.transform.position);
-                if (distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    newTarget = obj.transform.gameObject;
-                }
-            }
+        //if (checkUnitCount == 0)
+        //{
+        //    // 레이어를 통한 적 탐지 방법
+        //    float searchRadius = 50f;
+        //    Vector3 currentPosition = transform.position;
+        //    Collider[] colliders = Physics.OverlapSphere(currentPosition, searchRadius, findLayerMask);
+
+        //    foreach (Collider obj in colliders)
+        //    {
+        //        float distance = Vector3.Distance(transform.position, obj.transform.position);
+        //        if (distance < closestDistance)
+        //        {
+        //            closestDistance = distance;
+        //            closeTarget = obj.gameObject;
+        //            //newTarget = obj.transform.gameObject;
+        //        }
+        //    }
+        //}
+
+        if (lineDistance <= closeDistance)
+        {
+            newTarget = lineTarget;
+        }
+        else
+        {
+            newTarget = closeTarget;
         }
 
         return newTarget;
@@ -495,7 +625,7 @@ public class InheriteStatus : MonoBehaviour
         {
             hpBarImage.fillAmount = 0;
             return;
-        }
+        }        
 
         hpBarImage.fillAmount = (float)this.status.curHp / this.status.finalHp;
     }

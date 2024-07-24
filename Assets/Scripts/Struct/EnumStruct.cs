@@ -7,7 +7,7 @@ namespace EnumStruct
     public enum UIState
     {
         Title,
-        MainMenu,
+        Main,
         Play,
         GameOver,
         TheEnd
@@ -37,6 +37,8 @@ namespace EnumStruct
         Destroyer,
         Tower,
         Door,
+        Core,
+        Castle,
     }
 
     public enum LineType
@@ -48,6 +50,7 @@ namespace EnumStruct
 
     public enum DamageType // 단일, 다수
     {
+        None,
         Target,
         AOE,
     }
