@@ -46,6 +46,10 @@ public class InheriteStatus : MonoBehaviour
     public GameObject rightHand;
     public GameObject leftHand;
 
+    // 랜덤 위치 이동
+    public Vector3 randomPosition;
+    public Vector3 randomPositionRange;
+
     void Start()
     {
         
@@ -220,7 +224,7 @@ public class InheriteStatus : MonoBehaviour
             || (this.status.curTarget == null && (curPoint == OutPostPoint.Point_03 || curPoint == OutPostPoint.Point_13 || curPoint == OutPostPoint.Point_23)))
         {
             float distancePoint = Vector3.Distance(targetOutPost.transform.position, transform.position);
-            Vector3 direction = (targetOutPost.transform.position - transform.position).normalized;
+            Vector3 direction = (targetOutPost.transform.position - transform.position + randomPosition).normalized;
             Vector3 newPosition = transform.position + direction * this.status.curSpeed * Time.deltaTime;            
 
             // 포인터에 접근한 경우(플레이어)
@@ -244,7 +248,7 @@ public class InheriteStatus : MonoBehaviour
             // 포인터와 먼 경우
             if (distancePoint > 2)
             {
-                transform.LookAt(targetOutPost.transform);
+                transform.LookAt(targetOutPost.transform.position + randomPosition);
                 transform.position = newPosition;
                 return;
             }
@@ -264,7 +268,7 @@ public class InheriteStatus : MonoBehaviour
                 float distanceTarget = Vector3.Distance(this.status.curTarget.transform.position, transform.position);
 
                 float distancePoint = Vector3.Distance(targetOutPost.transform.position, transform.position);
-                Vector3 directionTarget = (targetOutPost.transform.position - transform.position).normalized;
+                Vector3 directionTarget = (targetOutPost.transform.position - transform.position + randomPosition).normalized;
                 Vector3 newPositionTarget = transform.position + directionTarget * this.status.curSpeed * Time.deltaTime;
 
                 // 포인터 도달 전 적이 더 가까운 경우 그쪽을 대상으로 함
@@ -300,7 +304,7 @@ public class InheriteStatus : MonoBehaviour
                 // 포인터와 먼 경우
                 if (distancePoint > 2)
                 {
-                    transform.LookAt(targetOutPost.transform);
+                    transform.LookAt(targetOutPost.transform.position + randomPosition);
                     transform.position = newPositionTarget;
                     return;
                 }

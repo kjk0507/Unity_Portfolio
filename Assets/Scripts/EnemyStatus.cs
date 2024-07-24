@@ -22,6 +22,9 @@ public class EnemyStatus : InheriteStatus
         ownLayerMask = LayerMask.NameToLayer("Enemy");
 
         isPointMove = true;
+
+        randomPositionRange = new Vector3(0f, 0f, 2f);
+        randomPosition = new Vector3(0, 0, Random.Range(-randomPositionRange.z, randomPositionRange.z));
         //SelectAction();
     }
 
